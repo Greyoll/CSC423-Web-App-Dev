@@ -1,0 +1,109 @@
+/* Container holding the image and the text */
+.container {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+/* Top left text */
+.top-left {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+}
+
+/* Top right text */
+.top-right {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+}
+
+/* Centered text */
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Images */
+.header-img {
+  width: 100%;   
+  height: auto;
+}
+
+.logo {
+  max-width: 100px; 
+  height: auto;
+}
+
+.about-img {
+  max-width: 200px; 
+  height: auto;
+}
+
+.about-section {
+    display: flex;
+    align-items: center;   /* vertically align text and image */
+    justify-content: center; /* center horizontally, can change to space-between if needed */
+    gap: 20px;  /* spacing between text and image */
+    padding: 20px;
+}
+
+/* Text left image right */
+.left-about-us-text {
+    text-align: left;
+    float: left;
+    margin-left: 15px;
+}
+.right-img {
+    float: right;
+    margin-right: 15px;
+}
+
+/* Text right image left */
+.right-about-us-text {
+    text-align: right;
+    float: right;
+    margin-right: 15px;
+}
+.left-img {
+    float: left;
+    margin-left: 15px;
+}
+
+/* Steps Section */
+.steps-section {
+    padding: 5rem 0;
+    display: flex;
+}
+
+.steps-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.step-card {
+    text-align: center;
+    padding: 2rem;
+}
+
+.step-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.step-card p {
+    color: #666;
+    font-size: 0.95rem;
+}
