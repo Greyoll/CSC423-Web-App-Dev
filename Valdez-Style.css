@@ -107,3 +107,20 @@
     color: #666;
     font-size: 0.95rem;
 }
+
+/* Footer Section */
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+.footer-card {
+  text-align: left;
+  padding: 2rem;
+}
