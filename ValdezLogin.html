@@ -2,21 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login Page</title>
+    <title>Valdez M.D Family Medicine</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="ValdezLogin.css">
 </head>
 <body>
-    <div class="login-container">
-        <form action="#" method="post">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Stanley" required>
+    <header>
+        <div class="logo">Valdez <span>MD</span></div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#" class="login-btn">Log In</a></li>
+            </ul>
+        </nav>
+    </header>
 
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="GMoney527" required>
+    <main class="main-container">
+        <div class="login-section">
+            <h1>Valdez M.D Family Medicine</h1>
+            <p>Please sign in to see more:</p>
 
-            <button type="submit">Login</button>
-        </form>
-    </div>
+            <label for="role">I am a:</label>
+            <select id="role" name="role">
+                <option value="patient">Patient</option>
+                <option value="doctor">Doctor</option>
+                <option value="staff">Staff</option>
+            </select>
+
+            <form action="#" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Stanley" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="GMoney527" required>
+
+                <button type="submit">Log In</button>
+            </form>
+        </div>
+
+        <div class="image-section">
+            <img src="Stan-login.jpg" alt="Valdez Family Medicine">
+        </div>
+    </main>
 </body>
 </html>
