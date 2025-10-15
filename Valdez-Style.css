@@ -20,7 +20,12 @@
 .top-right {
   position: absolute;
   top: 8px;
-  right: 16px;
+  right: 130px;
+  
+  
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  column-gap: 10%;
 }
 
 /* Centered text */
@@ -35,6 +40,7 @@
 .header-img {
   width: 100%;   
   height: auto;
+  filter: blur(1px);
 }
 
 .logo {
