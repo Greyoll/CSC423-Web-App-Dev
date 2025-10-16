@@ -1,3 +1,7 @@
+* {
+  font-family: Arial, sans-serif;
+}
+
 /* Container holding the image and the text */
 .container {
   position: relative;
@@ -16,7 +20,12 @@
 .top-right {
   position: absolute;
   top: 8px;
-  right: 16px;
+  right: 130px;
+  
+  
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  column-gap: 10%;
 }
 
 /* Centered text */
@@ -31,6 +40,7 @@
 .header-img {
   width: 100%;   
   height: auto;
+  filter: blur(1px);
 }
 
 .logo {
@@ -48,15 +58,41 @@
     align-items: center;   /* vertically align text and image */
     justify-content: center; /* center horizontally, can change to space-between if needed */
     gap: 20px;  /* spacing between text and image */
-    padding: 20px;
+    padding: 3rem 0;
 }
+
+/* Buttons */
+.button {
+	background-color: #000000;
+	color: white;
+	padding: 10px 20px; 
+	border: none; /* No border */
+	border-radius: 5px; /* for rounded corners */
+	text-align: center; 
+	text-decoration: none; 
+	display: inline-block; /* Allows setting width/height and other block-level properties */
+}
+
+.headerButton {
+	border: 2px solid #FFFFFF;
+	padding: 10px 20px; 
+	border-radius: 5px; /* for rounded corners */
+	text-align: center; 
+	text-decoration: none; 
+	display: inline-block; /* Allows setting width/height and other block-level properties */
+}
+	
+
 
 /* Text left image right */
 .left-about-us-text {
     text-align: left;
     float: left;
     margin-left: 15px;
+	width: 40%;
+	text-wrap: balance;
 }
+	
 .right-img {
     float: right;
     margin-right: 15px;
@@ -64,18 +100,20 @@
 
 /* Text right image left */
 .right-about-us-text {
-    text-align: right;
+    text-align: left;
     float: right;
-    margin-right: 15px;
+    margin-left: 150px;
+	width: 40%;
+	text-wrap: balance;
 }
 .left-img {
     float: left;
-    margin-left: 15px;
+    margin-left: 40px;
 }
 
 /* Steps Section */
 .steps-section {
-    padding: 5rem 0;
+    padding: 1rem 0;
     display: flex;
 }
 
