@@ -1,0 +1,24 @@
+{
+  "name": "csc423-web-app-dev",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Greyoll/CSC423-Web-App-Dev.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Greyoll/CSC423-Web-App-Dev/issues"
+  },
+  "homepage": "https://github.com/Greyoll/CSC423-Web-App-Dev#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^8.19.1"
+  }
+}
