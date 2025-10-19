@@ -11,7 +11,9 @@ const SECRET = process.env.JWT_SECRET || "mysecretkey";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname)); 
+
+// Serve static files from client/src
+app.use(express.static(path.join(__dirname, "client/src")));
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI)
@@ -49,9 +51,8 @@ app.post("/api/users/login", async (req, res) => {
   }
 });
 
-// Default route (serve login page)
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "ValdezLogin.html"));
+  res.sendFile(path.join(__dirname, "client/src/ValdezLogin.html"));
 });
 
 app.listen(PORT, () => {
