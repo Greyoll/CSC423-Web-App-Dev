@@ -12,7 +12,7 @@ const SECRET = process.env.JWT_SECRET || "mysecretkey";
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from client/src
+// Serve static files (HTML, CSS, JS, images)
 app.use(express.static(path.join(__dirname, "client/src")));
 
 // Connect to MongoDB Atlas
@@ -44,15 +44,27 @@ app.post("/api/users/login", async (req, res) => {
       return res.status(401).send("Invalid credentials.");
     }
 
-    const token = jwt.sign({ id: user._id, username: user.username }, SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(
+      { id: user._id, username: user.username },
+      SECRET,
+      { expiresIn: "1h" }
+    );
+
     res.json({ message: "Login successful", token });
   } catch (err) {
+    console.error(err);
     res.status(500).send("Server error.");
   }
 });
 
+// Default route for login page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "client/src/ValdezLogin.html"));
+});
+
+// Fallback route for 404s
+app.use((req, res) => {
+  res.status(404).send("Page not found.");
 });
 
 app.listen(PORT, () => {
