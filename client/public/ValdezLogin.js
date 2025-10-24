@@ -25,8 +25,22 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         const data = await response.json();
         // Save JWT
         localStorage.setItem("token", data.token);
-        // Redirect to ValdezHome.html
-        window.location.href = "ValdezHome.html";
+        // Save role
+        const userRole = data.role;
+
+        let redirect = "ValdezHome.html";
+        // Redirect to proper index
+        if (userRole === "admin") {
+            redirect = "dashboardAdmin.html";
+        }
+        else if (userRole === "doctor") {
+            redirect = "dashboardDoctor.html";
+        }
+        else if (userRole === "patient") {
+            redirect = "dashboardPatient.html";
+        }
+       
+        window.location.href = redirect;
 
     } catch (err) {
         console.error(err);

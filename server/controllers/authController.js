@@ -14,7 +14,7 @@ module.exports.userLogin = async (req, res) => {
     if (!user) {
         return res.status(401).json({error: "Invalid credentials"});
     }
-    const checkPass = bcrypt.compare(password, user.password);
+    const checkPass = await bcrypt.compare(password, user.password);
     if (!checkPass) {
         return res.status(401).json({error: "Invalid credentials"});
     }
@@ -25,5 +25,5 @@ module.exports.userLogin = async (req, res) => {
         );
     user.lastLogin = new Date();
     await user.save();
-    res.json({ message: "Login successful", token });
+    res.json({ message: "Login successful", token, role: user.role });
 }
