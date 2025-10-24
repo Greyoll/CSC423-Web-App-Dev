@@ -12,7 +12,7 @@ const MONGO_URI = process.env.MONGO_URI;
 app.use(express.json());
 
 // Serve static files (HTML, CSS, JS, images)
-app.use(express.static(path.join(__dirname, "../client/src")));
+app.use(express.static(path.join(__dirname, "../client/public")));
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("Connected to DB"))
