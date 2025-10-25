@@ -2,9 +2,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 
-const SECRET = process.env.JWT_SECRET;
-
 module.exports.userLogin = async (req, res) => {
+    const SECRET = process.env.JWT_SECRET;
+
     const username = req.body.username;
     const password = req.body.password
     if (!username || !password) {

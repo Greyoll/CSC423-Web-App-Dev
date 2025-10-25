@@ -28,16 +28,16 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         // Save role
         const userRole = data.role;
 
-        let redirect = "./ValdezHome.html";
+        let redirect = "index.html";
         // Redirect to proper index
         if (userRole === "admin") {
-            redirect = "./dashboardAdmin.html";
+            redirect = "dashboardAdmin.html";
         }
         else if (userRole === "doctor") {
-            redirect = "./dashboardDoctor.html";
+            redirect = "dashboardDoctor.html";
         }
         else if (userRole === "patient") {
-            redirect = "./dashboardPatient.html";
+            redirect = "dashboardPatient.html";
         }
        
         window.location.href = redirect;
