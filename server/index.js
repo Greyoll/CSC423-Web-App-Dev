@@ -14,7 +14,7 @@ app.use(express.json());
 // Serve static files (HTML, CSS, JS, images)
 app.use(express.static(path.join(__dirname, "../client/public")));
 
-app.use("/api/auth", authRoutes);
+app.use("/api/users", authRoutes);
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("Connected to DB"))
