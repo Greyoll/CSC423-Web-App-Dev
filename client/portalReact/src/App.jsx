@@ -3,9 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function dashboardAdmin() {
   return (
     <>
       <div class="dashboard-container">
@@ -99,6 +97,12 @@ function App() {
   </div>
     </>
   )
+}
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return dashboardAdmin();
 }
 
 export default App
