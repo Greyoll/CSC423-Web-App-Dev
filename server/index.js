@@ -1,3 +1,4 @@
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
@@ -12,7 +13,12 @@ const MONGO_URI = process.env.MONGO_URI;
 app.use(express.json());
 
 // Serve static files (HTML, CSS, JS, images)
-app.use(express.static(path.join(__dirname, "../client/public")));
+// app.use(express.static(path.join(__dirname, "../client/public")));
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "PUT", "POST", "DELETE"],
+  credentials: true
+}));
 
 app.use("/api/users", authRoutes);
 
