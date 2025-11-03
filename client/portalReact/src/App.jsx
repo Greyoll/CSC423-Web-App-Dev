@@ -1,6 +1,48 @@
+import { useState } from 'react';
 import './App.css'
 
-function login() {
+function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!username || !password) {
+      alert("Please enter both a username and a password");
+      return;
+    }
+
+    try {
+      const response = await fetch("api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (!response.ok) {
+        const errtext = await response.text();
+        alert("Failed to login: " + errtext);
+        return;
+      }
+
+      const data = await response.json();
+      console.log(data);
+      // Saves JWT
+      localStorage.setItem("token", data.token);
+
+      // redirect based on role
+      const userRole = data.role;
+
+      if (userRole === "doctor") {
+        return <DashboardDoctor />;
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Check console, an error has occurred.")
+    }
+  } 
+
   return (
     <>
       <header>
@@ -27,12 +69,12 @@ function login() {
                   <option value="staff">Staff</option>
               </select>
 
-              <form id="loginForm" action="#" method="post">
+              <form id="loginForm" onSubmit={handleSubmit}>
                   <label htmlFor="username">Username:</label>
-                  <input type="text" id="username" name="username" placeholder="Stanley" required />
+                  <input type="text" id="username" name="username" placeholder="Stanley" required value={username} onChange={(e) => setUsername(e.target.value)} />
 
                   <label htmlFor="password">Password:</label>
-                  <input type="password" id="password" name="password" placeholder="GMoney527" required />
+                  <input type="password" id="password" name="password" placeholder="GMoney527" required value={password} onChange={(e) => setPassword(e.target.value)}/>
 
                   <button type="submit">Log In</button>
               </form>
@@ -46,7 +88,7 @@ function login() {
   )
 }
 
-function dashboardDoctor() {
+function DashboardDoctor() {
   return (
     <>
       <div className="dashboard-container">
@@ -143,7 +185,7 @@ function dashboardDoctor() {
 }
 
 function App() {
-  return login();
+  return <Login />;
 }
 
 export default App
