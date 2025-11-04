@@ -1,7 +1,9 @@
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const authRoutes = require("./routes/authRoutes");
+const userRoutes =  require("./routes/userRoutes");
 
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
@@ -12,9 +14,15 @@ const MONGO_URI = process.env.MONGO_URI;
 app.use(express.json());
 
 // Serve static files (HTML, CSS, JS, images)
-app.use(express.static(path.join(__dirname, "../client/public")));
+// app.use(express.static(path.join(__dirname, "../client/public")));
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "PUT", "POST", "DELETE"],
+  credentials: true
+}));
 
-app.use("/api/users", authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api.users", userRoutes);
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("Connected to DB"))
@@ -23,10 +31,12 @@ mongoose.connect(MONGO_URI)
         process.exit(1);
     })
 
+/*
 // Default route for login page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/public/index.html"));
 });
+*/
 
 // Fallback route for 404s
 app.use((req, res) => {
