@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const path = require("path");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes =  require("./routes/userRoutes");
+const appointmentRoutes = require("./routes/appointmentRoutes");
 
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
@@ -21,8 +22,12 @@ app.use(cors({
   credentials: true
 }));
 
+// Auth routes
 app.use("/api/auth", authRoutes);
-app.use("/api.users", userRoutes);
+// User CRUD routes
+app.use("/api/users", userRoutes);
+// Appointment CRUD routes
+app.use("/api/appointments", appointmentRoutes);
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("Connected to DB"))
