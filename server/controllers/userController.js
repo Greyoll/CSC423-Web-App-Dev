@@ -19,10 +19,15 @@ module.exports.createUser = async (req, res) => {
         if (existing) {
             return res.status(409).json({ error: "User with that username already exists" });
         }
+        // Generate new id
+        const last = await User.findOne().sort({ id: -1 });
+        const newId = last ? last.id + 1 : 1;
 
+        // Hash password
         const hash = await bcrypt.hash(password, 10);
 
         const newUser = new User ({
+            id: newId,
             firstName,
             lastName,
             username,
@@ -36,5 +41,30 @@ module.exports.createUser = async (req, res) => {
         res.json({ message: "User created successfully", user: newUser });
     } catch (err) {
         res.status(500).json({ error: "Serverside error" });
+    }
+};
+
+// Get ALL users
+module.exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json(users);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "An error has occured when trying to fetch users, check console" });
+    }
+};
+
+// Get  a specfic user from their id
+module.exports.getUser = async (req, res) => {
+    try {
+        const user = await User.findOne({ id: req.params.id });
+        if (!user) {
+            return res.status(404).json({ error: "Error! No such user found" });
+        }
+        res.status(200).json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "An error has occurred, could not fetch the user" });
     }
 };
