@@ -4,6 +4,8 @@ import './App.css'
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -14,7 +16,7 @@ function Login() {
     }
 
     try {
-      const response = await fetch("api/users/login", {
+      const response = await fetch("http://localhost:3000/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -27,21 +29,23 @@ function Login() {
       }
 
       const data = await response.json();
-      console.log(data);
+    
       // Saves JWT
       localStorage.setItem("token", data.token);
 
       // redirect based on role
-      const userRole = data.role;
+      setRole(data.role);
+      setLoggedIn(true);
 
-      if (userRole === "doctor") {
-        return <DashboardDoctor />;
-      }
     } catch (err) {
       console.error(err);
       alert("Check console, an error has occurred.")
     }
-  } 
+  }; 
+
+  if (role === "doctor" && loggedIn) {
+    return <DashboardDoctor />;
+  }
 
   return (
     <>
