@@ -39,12 +39,18 @@ function Login() {
 
     } catch (err) {
       console.error(err);
-      alert("Check console, an error has occurred.")
+      alert("Check console, an error has occurred.");
     }
   }; 
 
   if (role === "doctor" && loggedIn) {
     return <DashboardDoctor />;
+  } 
+  else if (role === "admin" && loggedIn) {
+    return <DashboardAdmin />;
+  }
+  else if (role === "patient" && loggedIn) {
+    return <DashboardPatient />;
   }
 
   return (
@@ -184,6 +190,165 @@ function DashboardDoctor() {
     </main>
 
     </div>
+    </>
+  )
+}
+
+function DashboardAdmin() {
+  return (
+    <>
+      <div className="dashboard-container">
+
+      <aside className="sidebar">
+        <div className="logo">
+          <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
+          <h1 className="nav-item">Admin Page</h1>
+        </div>
+        <nav className="nav-menu">
+          <a className="nav-item active" href="#">Dashboard</a>
+          <a className="nav-item" href="#">Patient Records</a>
+          <a className="nav-item" href="#">Appointments</a>
+          <a className="nav-item" href="#">Prescriptions</a>
+          <a className="nav-item" href="#">Messages</a>
+        </nav>
+        <div className="settings">
+          <a href="#">User Management</a>
+          <a href="#">System Settings</a>
+          <a href="#">Settings</a>
+          <a href="#">Logout</a>
+        </div>
+      </aside>
+
+      <main className="main-content">
+        <header className="main-header">
+          <h1>Admin Dashboard</h1>
+          <div className="user-info">
+            <span>Admin</span>
+          </div>
+        </header>
+
+
+        <section className="appointments-section">
+          <h2>Recent Patient Updates</h2>
+          <div className="appointment-cards">
+            <div className="card">
+              <h1>Jane Foster</h1>
+              <h2>New Lab Results Available</h2>
+              <p>Uploaded: 10/12/2025</p>
+            </div>
+            <div className="card">
+              <h1>Peter Parker</h1>
+              <h2>Medication Adjustment Submitted</h2>
+              <p>Submitted: 10/13/2025</p>
+            </div>
+            <div className="card">
+              <h1>Tony Stark</h1>
+              <h2>Cardiology Referral Sent</h2>
+              <p>Updated: 10/10/2025</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="appointments-section">
+          <h2>New Messages</h2>
+          <div className="appointment-cards">
+            <div className="card">
+              <h1>From: John Doe</h1>
+              <h2>Subject: Question about medication</h2>
+              <p>Received: 10/14/2025</p>
+            </div>
+            <div className="card">
+              <h1>From: Sarah Connor</h1>
+              <h2>Subject: Appointment follow-up</h2>
+              <p>Received: 10/13/2025</p>
+            </div>
+            <div className="card">
+              <h1>From: Pharmacy Team</h1>
+              <h2>Subject: Prescription refill approval</h2>
+              <p>Received: 10/12/2025</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      </div>
+    </>
+  )
+}
+
+function DashboardPatient () {
+  return (
+    <>
+      <div className="dashboard-container">
+    
+      <aside className="sidebar">
+        <div className="logo">
+          <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
+        </div>
+        <nav className="nav-menu">
+          <a className="nav-item active" href="#">Dashboard</a>
+          <a className="nav-item" href="#">Schedule an appointment</a>
+          <a className="nav-item" href="#">Contact a doctor</a>
+          <a className="nav-item" href="#">Refill prescription</a>
+        </nav>
+        <div className="settings">
+          <a href="#">Settings</a>
+          <a href="#">Logout</a>
+        </div>
+      </aside>
+
+      <main className="main-content">
+        <header className="main-header">
+          <h1>Dashboard</h1>
+          <div className="user-info">
+            <span>Patient Name</span>
+          </div>
+        </header>
+
+        <section className="appointments-section">
+          <h2>Upcoming Appointments</h2>
+          <div className="appointment-cards">
+            <div className="card">
+              <h1>Check Up</h1>
+              <h2>Dr. Stanley Valdez</h2>
+              <p>04/20/2026 6:09AM</p>
+            </div>
+            <div className="card">
+              <h1>Retinal Exam</h1>
+              <h2>Dr. Ryan F</h2>
+              <p>02/02/2027 5:00PM</p>
+            </div>
+            <div className="card">
+              <h1>GI Appointment</h1>
+              <h2>Dr. Collin F</h2>
+              <p>08/30/2127 8:00AM</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="appointments-section">
+          <h2>Appointment History</h2>
+          <div className="appointment-cards">
+            <div className="card">
+              <h1>Blood Test</h1>
+              <h2>Dr. Stanley Valdez</h2>
+              <p>04/20/2022 06:09AM</p>
+            </div>
+            <div className="card">
+              <h1>Physical</h1>
+              <h2>Dr. Jenny E</h2>
+              <p>07/07/2023 07:50AM</p>
+            </div>
+            <div className="card">
+              <h1>General Wellness</h1>
+              <h2>Dr. James H</h2>
+              <p>12/30/2023 08:00AM</p>
+            </div>
+          </div>
+        </section>
+      </main>
+      
+      </div>
     </>
   )
 }

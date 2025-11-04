@@ -2,7 +2,7 @@ const express = require("express");
 const { createUser, getAllUsers, getUser, updateUser, deleteUser } = require("../controllers/userController");
 const jwt = require("jsonwebtoken");
 
-const router = express.router();
+const router = express.Router();
 
 // Validate the token
 const tokenValidator = (req, res, next) => {
@@ -46,4 +46,4 @@ router.put("/:id", tokenValidator, updateUser);
 // Delete user
 router.delete("/:id", tokenValidator, deleteUser);
 
-modules.exports = router;
+module.exports = router;
