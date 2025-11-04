@@ -68,3 +68,36 @@ module.exports.getUser = async (req, res) => {
         res.status(500).json({ error: "An error has occurred, could not fetch the user" });
     }
 };
+
+// Update user (using their id)
+module.exports.updateUser = async (req, res) => {
+    try {
+        const updates = req.body;
+        const updatedUser = await User.findByIdAndUpdate(
+            { id: req.params.id },
+            updates,
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: "Error! User not found" });
+        }
+        res.status(200).json({ message: "User updated", user: updatedUser});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "An error has occurred, could not update user"});
+    }
+};
+
+// Delete user
+module.exports.deleteUser = async (req, res) => {
+    try {
+        const deletedUser = await User.findOneAndDelete({ id: req.params.id });
+        if (!deletedUser) {
+            return res.status(404).json({ error: "Error! User not found" });
+        }
+        res.status(500).json({ message: "User deleted" });
+    } catch (err) {
+        console.error(err).status(500).json({ error: "Failed to delete user" });
+    }
+};

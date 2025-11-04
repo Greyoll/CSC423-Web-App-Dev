@@ -1,5 +1,5 @@
 const express = require("express");
-const { createUser } = require("../controllers/userController");
+const { createUser, getAllUsers, getUser, updateUser, deleteUser } = require("../controllers/userController");
 const jwt = require("jsonwebtoken");
 
 const router = express.router();
@@ -35,6 +35,15 @@ const tokenValidator = (req, res, next) => {
     }
 }
 
+// Create user 
 router.put("/users", tokenValidator, createUser);
+// Get all users
+router.get("/", tokenValidator, getAllUsers);
+// Get specfic user
+router.get("/:id", tokenValidator, getUser);
+// Update user
+router.put("/:id", tokenValidator, updateUser);
+// Delete user
+router.delete("/:id", tokenValidator, deleteUser);
 
 modules.exports = router;
