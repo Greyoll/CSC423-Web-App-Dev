@@ -418,3 +418,34 @@ nav a {
   color: #888;
   font-size: 0.85rem;
 }
+
+/* Make sidebar buttons look like sidebar links */
+.sidebar .nav-item {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 0.95rem;
+  text-align: left;
+  padding: 1rem 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.sidebar .nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .settings button.nav-item {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 0.85rem;
+  display: block;
+  margin-top: 1rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar .settings button.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
