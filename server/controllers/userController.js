@@ -4,6 +4,7 @@ const User = require("../models/userModel");
 // Create user function, this is only for admins
 module.exports.createUser = async (req, res) => {
     try {
+        alert("REQ.USER:", req.user);
         if (req.user.role !== "admin") {
             return res.status(403).json({ error: "Only admins can create new users" });
         }
@@ -58,7 +59,8 @@ module.exports.getAllUsers = async (req, res) => {
 // Get  a specfic user from their id
 module.exports.getUser = async (req, res) => {
     try {
-        const user = await User.findOne({ id: req.params.id });
+        const user = await User.findById(req.params.id);
+        //const user = await User.findOne({ id: req.params.id });
         if (!user) {
             return res.status(404).json({ error: "Error! No such user found" });
         }
@@ -73,11 +75,18 @@ module.exports.getUser = async (req, res) => {
 module.exports.updateUser = async (req, res) => {
     try {
         const updates = req.body;
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            updates,
+            {new: true}
+        );
+        /**
         const updatedUser = await User.findOneAndUpdate(
             { id: req.params.id },
             updates,
             { new: true }
         );
+        */
 
         if (!updatedUser) {
             return res.status(404).json({ error: "Error! User not found" });
@@ -92,7 +101,8 @@ module.exports.updateUser = async (req, res) => {
 // Delete user
 module.exports.deleteUser = async (req, res) => {
     try {
-        const deletedUser = await User.findOneAndDelete({ id: req.params.id });
+        const deletedUser = await User.findByIdAndDelete(req.params.id);
+        //const deletedUser = await User.findOneAndDelete({ id: req.params.id });
         if (!deletedUser) {
             return res.status(404).json({ error: "Error! User not found" });
         }

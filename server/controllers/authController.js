@@ -8,21 +8,21 @@ module.exports.userLogin = async (req, res) => {
     const username = req.body.username;
     const password = req.body.password
     if (!username || !password) {
-        return res.status(400).json({error: "Missing fields"});
+        return res.status(400).json({ error: "Missing fields" });
     }
-    const user = await User.findOne({username});
+    const user = await User.findOne({ username });
     if (!user) {
-        return res.status(401).json({error: "Invalid credentials"});
+        return res.status(401).json({ error: "Invalid credentials" });
     }
     const checkPass = await bcrypt.compare(password, user.password);
     if (!checkPass) {
-        return res.status(401).json({error: "Invalid credentials"});
+        return res.status(401).json({ error: "Invalid credentials" });
     }
     const token = jwt.sign(
-          { id: user._id, username: user.username },
-          SECRET,
-          { expiresIn: "1h" }
-        );
+        { id: user.id, username: user.username, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+    );
     user.lastLogin = new Date();
     await user.save();
     res.json({ message: "Login successful", token, role: user.role });

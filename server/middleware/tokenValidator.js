@@ -21,7 +21,7 @@ function tokenValidator (req, res, next) {
 
         // Verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+        console.log("Decoded token:", decoded);
         // Leave decoded data in user data so it can be used later
         req.user = decoded;
 

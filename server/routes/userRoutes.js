@@ -5,7 +5,7 @@ const tokenValidator = require("../middleware/tokenValidator");
 const router = express.Router();
 
 // Create user 
-router.post("/users", tokenValidator, createUser);
+router.post("/", tokenValidator, createUser);
 // Get all users
 router.get("/", tokenValidator, getAllUsers);
 // Get specfic user
