@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 // Create user function, this is only for admins
 module.exports.createUser = async (req, res) => {
     try {
-        alert("REQ.USER:", req.user);
+        //alert("REQ.USER:", req.user);
         if (req.user.role !== "admin") {
             return res.status(403).json({ error: "Only admins can create new users" });
         }
@@ -39,9 +39,10 @@ module.exports.createUser = async (req, res) => {
         });
 
         await newUser.save();
-        res.status(201).json({ message: "User created successfully", user: newUser });
+        res.status(200).json({ message: "User created successfully", user: newUser });
     } catch (err) {
-        res.status(500).json({ error: "Serverside error" });
+        console.error("Error creating user:", err);
+        res.status(500).json({ error: "Serverside error", details: err.message });
     }
 };
 
