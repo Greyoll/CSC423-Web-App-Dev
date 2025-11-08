@@ -1,0 +1,418 @@
+* {
+	font-family: Arial, sans-serif;
+}
+
+
+
+/* ================================
+   from ValdezDashboard.css
+   ================================ */
+
+.ValdezDashboard body {
+    margin: 0;
+    padding: 0;
+}
+
+.ValdezDashboard .dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.ValdezDashboard .sidebar {
+  background-color: #000000;
+  width: 240px;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ValdezDashboard .logo {
+  text-align: center;
+  width: 100%;
+}
+
+.ValdezDashboard .logo img {
+  width: 120px;
+  height: auto;
+}
+
+.ValdezDashboard .nav-menu {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.ValdezDashboard .nav-item {
+  color: #ffffff;
+  padding: 1rem 0;
+  font-size: 0.95rem;
+}
+
+.ValdezDashboard .settings a {
+  color: #ffffff;
+  font-size: 0.85rem;
+  display: block;
+  margin-top: 1rem;
+}
+
+/* Main content */
+.ValdezDashboard .main-content {
+  flex: 1;
+  padding: 2rem;
+}
+
+.ValdezDashboard .main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.ValdezDashboard .user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Appointment Sections */
+.ValdezDashboard .appointments-section {
+  margin-bottom: 2rem;
+  background-color: #F0F0F0;
+  padding: 1.5rem;
+  width: 90%;
+  border-radius: 12px;
+}
+
+/* Cards */
+.ValdezDashboard .appointment-cards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ValdezDashboard .card {
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  flex: 1 1 250px;
+  box-sizing: border-box;
+}
+
+.ValdezDashboard .card h1 {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.ValdezDashboard .card h2 {
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.ValdezDashboard .card p {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+
+
+
+/* ================================
+   from Valdez-Style.css
+   ================================ */
+
+.ValdezStyle * {
+  font-family: Arial, sans-serif;
+}
+
+.ValdezStyle .container {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+.ValdezStyle .top-left {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+}
+
+.ValdezStyle .top-right {
+  position: absolute;
+  top: 8px;
+  right: 130px;
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  column-gap: 10%;
+}
+
+.ValdezStyle .centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Images */
+.ValdezStyle .header-img {
+  width: 100%;   
+  height: auto;
+  filter: blur(1px);
+}
+
+.ValdezStyle .logo {
+  max-width: 100px; 
+  height: auto;
+}
+
+.ValdezStyle .about-img {
+  max-width: 200px; 
+  height: auto;
+}
+
+.ValdezStyle .about-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 3rem 0;
+}
+
+/* Buttons */
+.ValdezStyle .button {
+  background-color: #000000;
+  color: white;
+  padding: 10px 20px; 
+  border: none;
+  border-radius: 5px;
+  text-align: center; 
+  text-decoration: none; 
+  display: inline-block;
+}
+
+.ValdezStyle .headerButton {
+  border: 2px solid #FFFFFF;
+  padding: 10px 20px; 
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.ValdezStyle .left-about-us-text {
+  text-align: left;
+  float: left;
+  margin-left: 15px;
+  width: 40%;
+  text-wrap: balance;
+}
+
+.ValdezStyle .right-img {
+    float: right;
+    margin-right: 15px;
+}
+
+.ValdezStyle .right-about-us-text {
+    text-align: left;
+    float: right;
+    margin-left: 150px;
+	width: 40%;
+	text-wrap: balance;
+}
+
+.ValdezStyle .left-img {
+    float: left;
+    margin-left: 40px;
+}
+
+.ValdezStyle .steps-section {
+    padding: 1rem 0;
+    display: flex;
+}
+
+.ValdezStyle .steps-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.ValdezStyle .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.ValdezStyle .step-card {
+    text-align: center;
+    padding: 2rem;
+}
+
+.ValdezStyle .step-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.ValdezStyle .step-card p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.ValdezStyle .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.ValdezStyle .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.ValdezStyle .footer-card {
+  text-align: left;
+  padding: 2rem;
+}
+
+
+
+/* ================================
+   from ValdezLogin.css
+   ================================ */
+
+
+.ValdezLogin body {
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+.ValdezLogin header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 4rem;
+}
+
+.ValdezLogin .logo {
+  font-family: 'Georgia', serif;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.ValdezLogin .logo span {
+  font-family: cursive;
+  font-size: 1.4rem;
+}
+
+.ValdezLogin nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.ValdezLogin nav a {
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+}
+
+.ValdezLogin .login-btn {
+  background-color: black;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+}
+
+.ValdezLogin .login-btn:hover {
+  opacity: 0.85;
+}
+
+/* MAIN LAYOUT */
+.ValdezLogin .main-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2rem 4rem;
+  gap: 3rem;
+}
+
+/* LEFT SIDE (FORM) */
+.ValdezLogin .login-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+}
+
+.ValdezLogin .login-section h1 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.ValdezLogin .login-section p {
+  margin: 0.5rem 0 1.5rem;
+  color: #444;
+}
+
+.ValdezLogin .login-section label {
+  margin-top: 1rem;
+  display: block;
+}
+
+.ValdezLogin .login-section select,
+.ValdezLogin .login-section input {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f2f2f2;
+  margin-top: 0.3rem;
+}
+
+.ValdezLogin .login-section input:focus,
+.ValdezLogin .login-section select:focus {
+  outline: none;
+  border-color: #888;
+  background-color: #fff;
+}
+
+.ValdezLogin .login-section button {
+  margin-top: 1.5rem;
+  width: 150px;
+  padding: 0.7rem;
+  background: #ddd;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.ValdezLogin .login-section button:hover {
+  background: #bbb;
+}
+
+.ValdezLogin .image-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ValdezLogin .image-section img {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 8px;
+  object-fit: cover;
+}
