@@ -4,44 +4,57 @@ import './App.css'
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("patient");
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  setError("");
+  if (!username || !password) {
+    setError("Please enter both a username and a password");
+    return;
+  }
 
-    if (!username || !password) {
-      alert("Please enter both a username and a password");
+  setIsLoading(true);
+
+  try {
+    console.log("Attempting login with:", { username, password });
+
+    const response = await fetch("http://localhost:3000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    console.log("Response status:", response.status);
+
+    let data;
+    try {
+      data = await response.json(); // safer JSON parsing
+      console.log("Parsed JSON:", data);
+    } catch (jsonErr) {
+      const text = await response.text();
+      console.log("Response text (not JSON):", text);
+      throw new Error("Invalid server response, expected JSON");
+    }
+
+    if (!response.ok) {
+      setError(data.error || data.message || "Login failed");
       return;
     }
 
-    try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-
-      if (!response.ok) {
-        const errtext = await response.text();
-        alert("Failed to login: " + errtext);
-        return;
-      }
-
-      const data = await response.json();
-
-      // Saves JWT
-      localStorage.setItem("token", data.token);
-
-      // redirect based on role
-      setRole(data.role);
-      setLoggedIn(true);
-
-    } catch (err) {
-      console.error(err);
-      alert(err);
-    }
-  };
+    localStorage.setItem("token", data.token);
+    setRole(data.role);
+    setLoggedIn(true);
+  } catch (err) {
+    console.error("Login fetch error:", err);
+    setError(err.message || "Network error occurred");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   if (role === "doctor" && loggedIn) {
     return <DashboardDoctor />;
@@ -73,20 +86,23 @@ function Login() {
           <p>Please sign in to see more:</p>
 
           <label htmlFor="role">I am a:</label>
-          <select id="role" name="role">
+          <select id="role" name="role" value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="patient">Patient</option>
             <option value="doctor">Doctor</option>
-            <option value="staff">Staff</option>
+            <option value="admin">Admin</option>
           </select>
 
           <form id="loginForm" onSubmit={handleSubmit}>
+            {error && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <label htmlFor="username">Username:</label>
             <input type="text" id="username" name="username" placeholder="Stanley" required value={username} onChange={(e) => setUsername(e.target.value)} />
 
             <label htmlFor="password">Password:</label>
             <input type="password" id="password" name="password" placeholder="GMoney527" required value={password} onChange={(e) => setPassword(e.target.value)} />
 
-            <button type="submit">Log In</button>
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? 'Logging in...' : 'Log In'}
+            </button>
           </form>
         </div>
 
@@ -113,7 +129,7 @@ function DashboardDoctor() {
           </nav>
           <div className="settings">
             <a href="#">Settings</a>
-            <a href="#">Logout</a>
+            <a href="#" onClick={handleLogout}>Logout</a>
           </div>
         </aside>
 
@@ -301,7 +317,7 @@ function DashboardAdmin() {
             </button>
             <a href="#">System Settings</a>
             <a href="#">Settings</a>
-            <a href="#">Logout</a>
+            <a href="#" onClick={handleLogout}>Logout</a>
           </div>
         </aside>
 
@@ -466,7 +482,7 @@ function DashboardPatient() {
           </nav>
           <div className="settings">
             <a href="#">Settings</a>
-            <a href="#">Logout</a>
+            <a href="#" onClick={handleLogout}>Logout</a>
           </div>
         </aside>
 
@@ -525,6 +541,11 @@ function DashboardPatient() {
     </>
   )
 }
+
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  window.location.href = "/";
+};
 
 function App() {
   return <Login />;

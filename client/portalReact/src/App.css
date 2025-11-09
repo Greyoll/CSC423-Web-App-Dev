@@ -19,6 +19,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 4rem;
+  color: #000000;
 }
 
 .logo {
@@ -48,7 +49,7 @@ nav a {
 
 .login-btn {
   background-color: black;
-  color: white;
+  color: rgb(255, 255, 255);
   padding: 0.5rem 1.2rem;
   border-radius: 6px;
 }
@@ -109,7 +110,7 @@ nav a {
    ================================= */
 .button {
   background-color: #000000;
-  color: white;
+  color: rgb(255, 255, 255);
   padding: 10px 20px; 
   border: none;
   border-radius: 5px;
@@ -150,16 +151,18 @@ nav a {
 .login-section h1 {
   font-size: 2rem;
   font-weight: bold;
+  color: #000000;
 }
 
 .login-section p {
   margin: 0.5rem 0 1.5rem;
-  color: #444;
+  color: #000000;
 }
 
 .login-section label {
   margin-top: 1rem;
   display: block;
+  color: #000000;
 }
 
 .login-section select,
@@ -171,6 +174,7 @@ nav a {
   border-radius: 4px;
   background-color: #f2f2f2;
   margin-top: 0.3rem;
+  color: #000000;
 }
 
 .login-section input:focus,
@@ -184,7 +188,7 @@ nav a {
   margin-top: 1.5rem;
   width: 150px;
   padding: 0.7rem;
-  background: #ddd;
+  background: #000000;
   border: none;
   border-radius: 50px;
   cursor: pointer;
