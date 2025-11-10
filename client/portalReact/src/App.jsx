@@ -449,55 +449,54 @@ function DashboardAdmin() {
   )
 }
 
-import { useState, useEffect } from "react";
 
 function DashboardPatient() {
-  const [user, setUser] = useState({ name: "Patient Name" });
-  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
-  const [pastAppointments, setPastAppointments] = useState([]);
+  const [activePage, setActivePage] = useState("dashboard");
+  const [userName] = useState("Paige");
 
-  // Load appointments on mount (replace with your real API call)
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  const [upcoming, setUpcoming] = useState([
+    { id: 1, title: "Check Up", doctor: "Dr. Stanley Valdez", date: "04/20/2026 6:09AM" },
+    { id: 2, title: "Retinal Exam", doctor: "Dr. Ryan F", date: "02/02/2027 5:00PM" },
+    { id: 3, title: "GI Appointment", doctor: "Dr. Collin F", date: "08/30/2027 8:00AM" },
+  ]);
 
-    // Example fetch from your backend API (customize this endpoint)
-    const fetchAppointments = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/api/patient/appointments", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUpcomingAppointments(data.upcoming || []);
-          setPastAppointments(data.past || []);
-        } else {
-          console.warn("Failed to load appointments");
-        }
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
-      }
-    };
+  const history = [
+    { title: "Blood Test", doctor: "Dr. Stanley Valdez", date: "04/20/2022 6:09AM" },
+    { title: "Physical", doctor: "Dr. Jenny E", date: "07/07/2023 7:50AM" },
+    { title: "General Wellness", doctor: "Dr. James H", date: "12/30/2023 8:00AM" },
+  ];
 
-    fetchAppointments();
-  }, []);
+  function handleCancel(id) {
+    setUpcoming(prev => prev.filter(a => a.id !== id));
+  }
 
-  const handleLogout = () => {
+  function handleLogout() {
     localStorage.removeItem("token");
-    window.location.reload(); // simple redirect back to login
-  };
+    window.location.reload();
+  }
+
+  function NavItem({ page, label }) {
+    return (
+      <button
+        onClick={() => setActivePage(page)}
+        className={`nav-item ${activePage === page ? "active" : ""}`}
+      >
+        {label}
+      </button>
+    );
+  }
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar */}
       <aside className="sidebar">
         <div className="logo">
-          <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
+          <img src="/Images/Logo_White.png" alt="Valdez MD Logo White" />
         </div>
         <nav className="nav-menu">
-          <a className="nav-item active" href="#">Dashboard</a>
-          <a className="nav-item" href="#">Schedule an Appointment</a>
-          <a className="nav-item" href="#">Contact a Doctor</a>
-          <a className="nav-item" href="#">Refill Prescription</a>
+          <NavItem page="dashboard" label="Dashboard" />
+          <NavItem page="schedule" label="Schedule Appointment" />
+          <NavItem page="contact" label="Contact Doctor" />
+          <NavItem page="refill" label="Refill Prescription" />
         </nav>
         <div className="settings">
           <a href="#">Settings</a>
@@ -505,50 +504,54 @@ function DashboardPatient() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="main-content">
         <header className="main-header">
-          <h1>Patient Dashboard</h1>
+          <h1>Dashboard</h1>
           <div className="user-info">
-            <span>{user.name}</span>
+            <span>Welcome, {userName}</span>
           </div>
         </header>
 
-        {/* Upcoming Appointments */}
-        <section className="appointments-section">
-          <h2>Upcoming Appointments</h2>
-          <div className="appointment-cards">
-            {upcomingAppointments.length > 0 ? (
-              upcomingAppointments.map((appt, index) => (
-                <div key={index} className="card">
-                  <h1>{appt.title}</h1>
-                  <h2>{appt.doctor}</h2>
-                  <p>{appt.date}</p>
-                </div>
-              ))
-            ) : (
-              <p>No upcoming appointments</p>
-            )}
-          </div>
-        </section>
+        {activePage === "dashboard" && (
+          <>
+            <section className="appointments-section">
+              <h2>Upcoming Appointments</h2>
+              <div className="appointment-cards">
+                {upcoming.length > 0 ? (
+                  upcoming.map(a => (
+                    <div className="card" key={a.id}>
+                      <h1>{a.title}</h1>
+                      <h2>{a.doctor}</h2>
+                      <p>{a.date}</p>
+                      <button className="cancel-btn" onClick={() => handleCancel(a.id)}>
+                        Cancel Appointment
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p>No upcoming appointments.</p>
+                )}
+              </div>
+            </section>
 
-        {/* Appointment History */}
-        <section className="appointments-section">
-          <h2>Appointment History</h2>
-          <div className="appointment-cards">
-            {pastAppointments.length > 0 ? (
-              pastAppointments.map((appt, index) => (
-                <div key={index} className="card">
-                  <h1>{appt.title}</h1>
-                  <h2>{appt.doctor}</h2>
-                  <p>{appt.date}</p>
-                </div>
-              ))
-            ) : (
-              <p>No past appointments found</p>
-            )}
-          </div>
-        </section>
+            <section className="appointments-section">
+              <h2>Appointment History</h2>
+              <div className="appointment-cards">
+                {history.map((a, i) => (
+                  <div className="card" key={i}>
+                    <h1>{a.title}</h1>
+                    <h2>{a.doctor}</h2>
+                    <p>{a.date}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {activePage === "schedule" && <h2>Schedule form goes here...</h2>}
+        {activePage === "contact" && <h2>Message doctor form...</h2>}
+        {activePage === "refill" && <h2>Refill request form...</h2>}
       </main>
     </div>
   );
