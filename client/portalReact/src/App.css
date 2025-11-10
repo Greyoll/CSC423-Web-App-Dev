@@ -49,7 +49,7 @@ nav a {
 
 .login-btn {
   background-color: black;
-  color: rgb(255, 255, 255);
+  color: rgb(255, 255, 255) !important;
   padding: 0.5rem 1.2rem;
   border-radius: 6px;
 }
@@ -188,7 +188,7 @@ nav a {
   margin-top: 1.5rem;
   width: 150px;
   padding: 0.7rem;
-  background: #000000;
+  background: #ddd;
   border: none;
   border-radius: 50px;
   cursor: pointer;

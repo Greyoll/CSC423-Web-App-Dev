@@ -18,10 +18,9 @@ app.use(express.json());
 // app.use(express.static(path.join(__dirname, "../client/public")));
 // Development CORS configuration
 app.use(cors({
-  origin: "http://localhost:5179", // Allow all origins in development
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+  origin: "http://localhost:5173", // Allow all origins in development
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
 }));
 
 // Auth routes
