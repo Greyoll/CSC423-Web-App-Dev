@@ -19,7 +19,7 @@ app.use(express.json());
 // Development CORS configuration
 app.use(cors({
   origin: "http://localhost:5173", // Allow all origins in development
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "PUT", "POST", "DELETE"],
   credentials: true
 }));
 
