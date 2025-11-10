@@ -449,82 +449,111 @@ function DashboardAdmin() {
   )
 }
 
+import { useState, useEffect } from "react";
+
 function DashboardPatient() {
+  const [user, setUser] = useState({ name: "Patient Name" });
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [pastAppointments, setPastAppointments] = useState([]);
+
+  // Load appointments on mount (replace with your real API call)
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // Example fetch from your backend API (customize this endpoint)
+    const fetchAppointments = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/patient/appointments", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUpcomingAppointments(data.upcoming || []);
+          setPastAppointments(data.past || []);
+        } else {
+          console.warn("Failed to load appointments");
+        }
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload(); // simple redirect back to login
+  };
+
   return (
-    <>
-      <div className="dashboard-container">
+    <div className="dashboard-container">
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div className="logo">
+          <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
+        </div>
+        <nav className="nav-menu">
+          <a className="nav-item active" href="#">Dashboard</a>
+          <a className="nav-item" href="#">Schedule an Appointment</a>
+          <a className="nav-item" href="#">Contact a Doctor</a>
+          <a className="nav-item" href="#">Refill Prescription</a>
+        </nav>
+        <div className="settings">
+          <a href="#">Settings</a>
+          <button onClick={handleLogout} className="logout-btn">Logout</button>
+        </div>
+      </aside>
 
-        <aside className="sidebar">
-          <div className="logo">
-            <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
+      {/* Main Content */}
+      <main className="main-content">
+        <header className="main-header">
+          <h1>Patient Dashboard</h1>
+          <div className="user-info">
+            <span>{user.name}</span>
           </div>
-          <nav className="nav-menu">
-            <a className="nav-item active" href="#">Dashboard</a>
-            <a className="nav-item" href="#">Schedule an appointment</a>
-            <a className="nav-item" href="#">Contact a doctor</a>
-            <a className="nav-item" href="#">Refill prescription</a>
-          </nav>
-          <div className="settings">
-            <a href="#">Settings</a>
-            <a href="#">Logout</a>
+        </header>
+
+        {/* Upcoming Appointments */}
+        <section className="appointments-section">
+          <h2>Upcoming Appointments</h2>
+          <div className="appointment-cards">
+            {upcomingAppointments.length > 0 ? (
+              upcomingAppointments.map((appt, index) => (
+                <div key={index} className="card">
+                  <h1>{appt.title}</h1>
+                  <h2>{appt.doctor}</h2>
+                  <p>{appt.date}</p>
+                </div>
+              ))
+            ) : (
+              <p>No upcoming appointments</p>
+            )}
           </div>
-        </aside>
+        </section>
 
-        <main className="main-content">
-          <header className="main-header">
-            <h1>Dashboard</h1>
-            <div className="user-info">
-              <span>Patient Name</span>
-            </div>
-          </header>
-
-          <section className="appointments-section">
-            <h2>Upcoming Appointments</h2>
-            <div className="appointment-cards">
-              <div className="card">
-                <h1>Check Up</h1>
-                <h2>Dr. Stanley Valdez</h2>
-                <p>04/20/2026 6:09AM</p>
-              </div>
-              <div className="card">
-                <h1>Retinal Exam</h1>
-                <h2>Dr. Ryan F</h2>
-                <p>02/02/2027 5:00PM</p>
-              </div>
-              <div className="card">
-                <h1>GI Appointment</h1>
-                <h2>Dr. Collin F</h2>
-                <p>08/30/2127 8:00AM</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="appointments-section">
-            <h2>Appointment History</h2>
-            <div className="appointment-cards">
-              <div className="card">
-                <h1>Blood Test</h1>
-                <h2>Dr. Stanley Valdez</h2>
-                <p>04/20/2022 06:09AM</p>
-              </div>
-              <div className="card">
-                <h1>Physical</h1>
-                <h2>Dr. Jenny E</h2>
-                <p>07/07/2023 07:50AM</p>
-              </div>
-              <div className="card">
-                <h1>General Wellness</h1>
-                <h2>Dr. James H</h2>
-                <p>12/30/2023 08:00AM</p>
-              </div>
-            </div>
-          </section>
-        </main>
-
-      </div>
-    </>
-  )
+        {/* Appointment History */}
+        <section className="appointments-section">
+          <h2>Appointment History</h2>
+          <div className="appointment-cards">
+            {pastAppointments.length > 0 ? (
+              pastAppointments.map((appt, index) => (
+                <div key={index} className="card">
+                  <h1>{appt.title}</h1>
+                  <h2>{appt.doctor}</h2>
+                  <p>{appt.date}</p>
+                </div>
+              ))
+            ) : (
+              <p>No past appointments found</p>
+            )}
+          </div>
+        </section>
+      </main>
+    </div>
+  );
 }
+
 
 function App() {
   return <Login />;
