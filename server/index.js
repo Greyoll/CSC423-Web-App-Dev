@@ -16,8 +16,9 @@ app.use(express.json());
 
 // Serve static files (HTML, CSS, JS, images)
 // app.use(express.static(path.join(__dirname, "../client/public")));
+// Development CORS configuration
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "http://localhost:5173", // Allow all origins in development
   methods: ["GET", "PUT", "POST", "DELETE"],
   credentials: true
 }));
