@@ -69,7 +69,9 @@ const handleSubmit = async (event) => {
   return (
     <>
       <header>
-        <div className="logo">Valdez <span>MD</span></div>
+        <div className="logo">
+            <img src="./Images/valdez_logo-black.jpg" alt="Valdez MD Logo Black" />
+          </div>
         <nav>
           <ul>
             <li><a href="#">Home</a></li>
@@ -115,15 +117,23 @@ const handleSubmit = async (event) => {
 }
 
 function DashboardDoctor() {
+  const [currentPage, setCurrentPage] = useState("dashboard"); // Track which page to show
+
+  if (currentPage === "appointments") {
+    return <DoctorAppointmentView onBack={() => setCurrentPage("dashboard")} />;
+  }
   return (
     <>
       <div className="dashboard-container">
 
         <aside className="sidebar">
+          <div className="logo">
+            <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
+          </div>
           <nav className="nav-menu">
             <a className="nav-item active" href="#">Dashboard</a>
             <a className="nav-item" href="#">Patient Records</a>
-            <a className="nav-item" href="#">Appointments</a>
+            <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); setCurrentPage("appointments"); }}>Appointments</a>
             <a className="nav-item" href="#">Prescriptions</a>
             <a className="nav-item" href="#">Messages</a>
           </nav>
@@ -295,6 +305,12 @@ function DashboardAdmin() {
     fetchUsers();
   };
 
+  const [currentPage, setCurrentPage] = useState("dashboard"); // Track which page to show
+
+  if (currentPage === "appointments") {
+    return <AdminAppointmentView onBack={() => setCurrentPage("dashboard")} />;
+  }
+
   return (
     <>
       <div className="dashboard-container">
@@ -307,7 +323,7 @@ function DashboardAdmin() {
           <nav className="nav-menu">
             <a className="nav-item active" href="#">Dashboard</a>
             <a className="nav-item" href="#">Patient Records</a>
-            <a className="nav-item" href="#">Appointments</a>
+            <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); setCurrentPage("appointments"); }}>Appointments</a>
             <a className="nav-item" href="#">Prescriptions</a>
             <a className="nav-item" href="#">Messages</a>
           </nav>
@@ -466,16 +482,21 @@ function DashboardAdmin() {
 }
 
 function DashboardPatient() {
+  const [currentPage, setCurrentPage] = useState("dashboard"); // Track which page to show
+
+  if (currentPage === "appointments") {
+    return <AppointmentView onBack={() => setCurrentPage("dashboard")} />;
+  }
   return (
     <>
       <div className="dashboard-container">
-
         <aside className="sidebar">
           <div className="logo">
             <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
           </div>
           <nav className="nav-menu">
             <a className="nav-item active" href="#">Dashboard</a>
+            <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); setCurrentPage("appointments"); }}>Appointments</a>
             <a className="nav-item" href="#">Schedule an appointment</a>
             <a className="nav-item" href="#">Contact a doctor</a>
             <a className="nav-item" href="#">Refill prescription</a>
@@ -542,6 +563,233 @@ function DashboardPatient() {
   )
 }
 
+function DoctorAppointmentView({ onBack }) {
+  return (
+    <div className="dashboard-container">
+      <aside className="sidebar">
+          <div className="logo">
+              <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
+          </div>
+          <nav className="nav-menu">
+              <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>Dashboard</a>
+              <a className="nav-item active" href="#">Appointments</a>
+              <a className="nav-item" href="#">Schedule an appointment</a>
+              <a className="nav-item" href="#">Contact a doctor</a>
+              <a className="nav-item" href="#">Refill prescription</a>
+          </nav>
+          <div className="settings">
+              <a href="#">Settings</a>
+              <a href="#">Logout</a>
+          </div>
+      </aside>
+
+      <main className="main-content">
+        <header className="main-header">
+          <h1>Doctor Appointments</h1>
+          <div className="user-info">
+            <span>Dr Stanley Valdez</span>
+          </div>
+        </header>
+
+        <section className="appointments-section">
+          <h2>Upcoming Appointments</h2>
+          <div className="appointment-cards">
+            <div className="card">
+              <h1>Check Up</h1>
+              <h2>Dr. Stanley Valdez</h2>
+              <p>04/20/2026 6:09AM</p>
+            </div>
+            <div className="card">
+              <h1>Retinal Exam</h1>
+              <h2>Dr. Ryan F</h2>
+              <p>02/02/2027 5:00PM</p>
+            </div>
+            <div className="card">
+              <h1>GI Appointment</h1>
+              <h2>Dr. Collin F</h2>
+              <p>08/30/2127 8:00AM</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="appointments-section">
+          <h2>Appointment History</h2>
+          <div className="appointment-cards">
+            <div className="card">
+              <h1>Blood Test</h1>
+              <h2>Dr. Stanley Valdez</h2>
+              <p>04/20/2022 06:09AM</p>
+            </div>
+            <div className="card">
+              <h1>Physical</h1>
+              <h2>Dr. Jenny E</h2>
+              <p>07/07/2023 07:50AM</p>
+            </div>
+            <div className="card">
+              <h1>General Wellness</h1>
+              <h2>Dr. James H</h2>
+              <p>12/30/2023 08:00AM</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function AdminAppointmentView({ onBack }) {
+  return (
+    <>
+      <div className="dashboard-container">
+        <aside className="sidebar">
+          <div className="logo">
+            <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
+            <h1 className="nav-item">Admin Page</h1>
+          </div>
+          <nav className="nav-menu">
+            <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>Dashboard</a>
+            <a className="nav-item" href="#">Patient Records</a>
+            <a className="nav-item active" href="#">Appointments</a>
+            <a className="nav-item" href="#">Prescriptions</a>
+            <a className="nav-item" href="#">Messages</a>
+          </nav>
+          <div className="settings">
+            <button className="nav-item" onClick={() => setShowPopup(true)}>
+              User Management
+            </button>
+            <a href="#">System Settings</a>
+            <a href="#">Settings</a>
+            <a href="#">Logout</a>
+          </div>
+        </aside>
+        <main className="main-content">
+          <header className="main-header">
+            <h1>Admin Appointments</h1>
+            <div className="user-info">
+              <span>Admin</span>
+            </div>
+          </header>
+
+          <section className="appointments-section">
+            <h2>Upcoming Appointments</h2>
+            <div className="appointment-cards">
+              <div className="card">
+                <h1>Check Up</h1>
+                <h2>Dr. Stanley Valdez</h2>
+                <p>04/20/2026 6:09AM</p>
+              </div>
+              <div className="card">
+                <h1>Retinal Exam</h1>
+                <h2>Dr. Ryan F</h2>
+                <p>02/02/2027 5:00PM</p>
+              </div>
+              <div className="card">
+                <h1>GI Appointment</h1>
+                <h2>Dr. Collin F</h2>
+                <p>08/30/2127 8:00AM</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="appointments-section">
+            <h2>Appointment History</h2>
+            <div className="appointment-cards">
+              <div className="card">
+                <h1>Blood Test</h1>
+                <h2>Dr. Stanley Valdez</h2>
+                <p>04/20/2022 06:09AM</p>
+              </div>
+              <div className="card">
+                <h1>Physical</h1>
+                <h2>Dr. Jenny E</h2>
+                <p>07/07/2023 07:50AM</p>
+              </div>
+              <div className="card">
+                <h1>General Wellness</h1>
+                <h2>Dr. James H</h2>
+                <p>12/30/2023 08:00AM</p>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </>
+  );
+}
+
+function AppointmentView({ onBack }) {
+  return (
+    <div className="dashboard-container">
+      <aside className="sidebar">
+          <div className="logo">
+              <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
+          </div>
+          <nav className="nav-menu">
+              <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>Dashboard</a>
+              <a className="nav-item active" href="#">Appointments</a>
+              <a className="nav-item" href="#">Schedule an appointment</a>
+              <a className="nav-item" href="#">Contact a doctor</a>
+              <a className="nav-item" href="#">Refill prescription</a>
+          </nav>
+          <div className="settings">
+              <a href="#">Settings</a>
+              <a href="#">Logout</a>
+          </div>
+      </aside>
+
+      <main className="main-content">
+        <header className="main-header">
+          <h1>Appointments</h1>
+          <div className="user-info">
+            <span>Patient Name</span>
+          </div>
+        </header>
+
+        <section className="appointments-section">
+          <h2>Upcoming Appointments</h2>
+          <div className="appointment-cards">
+            <div className="card">
+              <h1>Check Up</h1>
+              <h2>Dr. Stanley Valdez</h2>
+              <p>04/20/2026 6:09AM</p>
+            </div>
+            <div className="card">
+              <h1>Retinal Exam</h1>
+              <h2>Dr. Ryan F</h2>
+              <p>02/02/2027 5:00PM</p>
+            </div>
+            <div className="card">
+              <h1>GI Appointment</h1>
+              <h2>Dr. Collin F</h2>
+              <p>08/30/2127 8:00AM</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="appointments-section">
+          <h2>Appointment History</h2>
+          <div className="appointment-cards">
+            <div className="card">
+              <h1>Blood Test</h1>
+              <h2>Dr. Stanley Valdez</h2>
+              <p>04/20/2022 06:09AM</p>
+            </div>
+            <div className="card">
+              <h1>Physical</h1>
+              <h2>Dr. Jenny E</h2>
+              <p>07/07/2023 07:50AM</p>
+            </div>
+            <div className="card">
+              <h1>General Wellness</h1>
+              <h2>Dr. James H</h2>
+              <p>12/30/2023 08:00AM</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  )
+}
 const handleLogout = () => {
   localStorage.removeItem("token");
   window.location.href = "/";
