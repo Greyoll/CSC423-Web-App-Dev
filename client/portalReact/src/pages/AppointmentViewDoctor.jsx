@@ -1,6 +1,53 @@
-import { handleLogout } from '../hooks/useLogin';
+import { useState, useEffect } from 'react';
+import { parseJwt, handleLogout } from '../hooks/useLogin';
+import DashboardDoctor from './DashboardDoctor';
 
-function AppointmentViewDoctor({ onBack }) {
+function AppointmentViewDoctor() {
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState("appointments");
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const payload = parseJwt(token);
+        if (!payload) {
+          setError("Invalid token");
+          setLoading(false);
+          return;
+        }
+        const userId = payload.id;
+
+        const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          setError("Failed to fetch appointments: " + errText);
+          setLoading(false);
+          return;
+        }
+
+        const data = await res.json();
+        setAppointments(Array.isArray(data) ? data : []);
+        setError(null);
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching appointments: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAppointments();
+  }, []);
+
+  if (currentPage === "dashboard") {
+    return <DashboardDoctor/>;
+  }
+
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -8,11 +55,11 @@ function AppointmentViewDoctor({ onBack }) {
           <img src="/Images/Logo_White.png" alt="Valdez MD Logo White" />
         </div>
         <nav className="nav-menu">
-          <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>Dashboard</a>
+          <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); setCurrentPage("dashboard"); }}>Dashboard</a>
+          <a className="nav-item" href="#">Patient Records</a>
           <a className="nav-item active" href="#">Appointments</a>
-          <a className="nav-item" href="#">Schedule an appointment</a>
-          <a className="nav-item" href="#">Contact a doctor</a>
-          <a className="nav-item" href="#">Refill prescription</a>
+          <a className="nav-item" href="#">Prescriptions</a>
+          <a className="nav-item" href="#">Messages</a>
         </nav>
         <div className="settings">
           <a href="#">Settings</a>
@@ -27,48 +74,28 @@ function AppointmentViewDoctor({ onBack }) {
             <span>Dr Stanley Valdez</span>
           </div>
         </header>
-
-        <section className="appointments-section">
-          <h2>Upcoming Appointments</h2>
-          <div className="appointment-cards">
-            <div className="card">
-              <h1>Check Up</h1>
-              <h2>Dr. Stanley Valdez</h2>
-              <p>04/20/2026 6:09AM</p>
+        {loading && <p style={{ padding: '20px' }}>Loading appointments...</p>}
+        {error && <p style={{ padding: '20px', color: 'red' }}>Error: {error}</p>}
+        {!loading && !error && appointments.length === 0 && (
+          <p style={{ padding: '20px' }}>No appointments found.</p>
+        )}
+        {!loading && !error && appointments.length > 0 && (
+          <section className="appointments-section">
+            <h2>Your Appointments</h2>
+            <div className="appointment-cards">
+              {appointments.map((apt) => (
+                <div className="card" key={apt._id || apt.id}>
+                  <h1>Appointment #{apt.id}</h1>
+                  <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                  <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
+                  <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
+                  <p><strong>Patient ID:</strong> {apt.patientId}</p>
+                  <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString()}</p>
+                </div>
+              ))}
             </div>
-            <div className="card">
-              <h1>Retinal Exam</h1>
-              <h2>Dr. Ryan F</h2>
-              <p>02/02/2027 5:00PM</p>
-            </div>
-            <div className="card">
-              <h1>GI Appointment</h1>
-              <h2>Dr. Collin F</h2>
-              <p>08/30/2127 8:00AM</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="appointments-section">
-          <h2>Appointment History</h2>
-          <div className="appointment-cards">
-            <div className="card">
-              <h1>Blood Test</h1>
-              <h2>Dr. Stanley Valdez</h2>
-              <p>04/20/2022 06:09AM</p>
-            </div>
-            <div className="card">
-              <h1>Physical</h1>
-              <h2>Dr. Jenny E</h2>
-              <p>07/07/2023 07:50AM</p>
-            </div>
-            <div className="card">
-              <h1>General Wellness</h1>
-              <h2>Dr. James H</h2>
-              <p>12/30/2023 08:00AM</p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
     </div>
   );

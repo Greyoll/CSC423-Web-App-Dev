@@ -37,7 +37,7 @@ function DashboardDoctor() {
   }, []);
 
   if (currentPage === "appointments") {
-    return <AppointmentViewDoctor onBack={() => setCurrentPage("dashboard")} />;
+    return <AppointmentViewDoctor/>;
   }
 
   return (
