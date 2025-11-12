@@ -1,7 +1,10 @@
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const authRoutes = require("./routes/authRoutes");
+const userRoutes =  require("./routes/userRoutes");
+const appointmentRoutes = require("./routes/appointmentRoutes");
 
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
@@ -12,9 +15,20 @@ const MONGO_URI = process.env.MONGO_URI;
 app.use(express.json());
 
 // Serve static files (HTML, CSS, JS, images)
-app.use(express.static(path.join(__dirname, "../client/public")));
+// app.use(express.static(path.join(__dirname, "../client/public")));
+// Development CORS configuration
+app.use(cors({
+  origin: "http://localhost:5173", // Allow all origins in development
+  methods: ["GET", "PUT", "POST", "DELETE"],
+  credentials: true
+}));
 
-app.use("/api/users", authRoutes);
+// Auth routes
+app.use("/api/auth", authRoutes);
+// User CRUD routes
+app.use("/api/users", userRoutes);
+// Appointment CRUD routes
+app.use("/api/appointments", appointmentRoutes);
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log("Connected to DB"))
@@ -23,10 +37,12 @@ mongoose.connect(MONGO_URI)
         process.exit(1);
     })
 
+/*
 // Default route for login page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/public/index.html"));
 });
+*/
 
 // Fallback route for 404s
 app.use((req, res) => {
