@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
 function Login() {
   // --- Login states ---
@@ -14,7 +14,6 @@ function Login() {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     username: "",
-    currentPassword: "",
     newPassword: "",
   });
   const [passError, setPassError] = useState("");
@@ -62,7 +61,7 @@ function Login() {
     window.location.reload();
   };
 
-  // --- Login page rendering ---
+  // --- Conditional rendering for dashboards ---
   if (role === "doctor" && loggedIn) return <DashboardDoctor />;
   if (role === "admin" && loggedIn) return <DashboardAdmin />;
   if (role === "patient" && loggedIn) return <DashboardPatient />;
@@ -131,7 +130,7 @@ function Login() {
             onClick={() => setShowChangePassword(true)}
             style={{ marginTop: "10px" }}
           >
-            Change Password
+            Reset Password
           </button>
         </div>
 
@@ -140,68 +139,71 @@ function Login() {
         </div>
       </main>
 
-      {/* Change Password Popup */}
-      {showChangePassword && (
-        <div className="popup-overlay">
-          <div className="popup">
-            <button className="close-btn" onClick={() => setShowChangePassword(false)}>X</button>
-            <h2>Change Password</h2>
+{/* --- Reset Password Popup --- */}
+{showChangePassword && (
+  <div className="popup-overlay">
+    <div className="popup">
+      <button className="close-btn" onClick={() => setShowChangePassword(false)}>X</button>
+      <h2>Reset Password</h2>
 
-            {passError && <p style={{ color: 'red' }}>{passError}</p>}
-            {passSuccess && <p style={{ color: 'green' }}>{passSuccess}</p>}
+      {passError && <p style={{ color: 'red' }}>{passError}</p>}
+      {passSuccess && <p style={{ color: 'green' }}>{passSuccess}</p>}
 
-            <input
-              type="text"
-              placeholder="Username"
-              value={passwordData.username}
-              onChange={(e) => setPasswordData({ ...passwordData, username: e.target.value })}
-            />
-            <input
-              type="password"
-              placeholder="Current Password"
-              value={passwordData.currentPassword}
-              onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-            />
-            <input
-              type="password"
-              placeholder="New Password"
-              value={passwordData.newPassword}
-              onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-            />
+      <input
+        type="text"
+        placeholder="Username"
+        value={passwordData.username}
+        onChange={(e) => setPasswordData({ ...passwordData, username: e.target.value })}
+      />
+      <input
+        type="password"
+        placeholder="New Password"
+        value={passwordData.newPassword}
+        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+      />
 
-            <button onClick={async () => {
-              setPassError("");
-              setPassSuccess("");
+      <button
+        onClick={async () => {
+          setPassError("");
+          setPassSuccess("");
 
-              const { username, currentPassword, newPassword } = passwordData;
-              if (!username || !currentPassword || !newPassword) {
-                setPassError("Please fill out all fields");
-                return;
+          const { username, newPassword } = passwordData;
+
+          if (!username || !newPassword) {
+            setPassError("Please fill out all fields");
+            return;
+          }
+
+          try {
+            const res = await fetch(
+              "http://localhost:3000/api/users/reset-password",
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: username.toLowerCase(), newPassword }),
               }
+            );
 
-              try {
-                const res = await fetch("http://localhost:3000/api/users/change-password-login", {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(passwordData)
-                });
+            const data = await res.json();
 
-                const data = await res.json();
-                if (!res.ok) {
-                  setPassError(data.message || "Failed to change password");
-                } else {
-                  setPassSuccess(data.message || "Password changed successfully!");
-                  setPasswordData({ username: "", currentPassword: "", newPassword: "" });
-                }
-              } catch (err) {
-                setPassError("Network error: " + err.message);
-              }
-            }}>
-              Submit
-            </button>
-          </div>
-        </div>
-      )}
+            if (!res.ok) {
+              setPassError(data.message || "Failed to reset password");
+            } else {
+              setPassSuccess(data.message || "Password reset successfully!");
+              setPasswordData({ username: "", newPassword: "" });
+            }
+          } catch (err) {
+            setPassError("Network error: " + err.message);
+          }
+        }}
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+)}
+
+
     </>
   );
 }
