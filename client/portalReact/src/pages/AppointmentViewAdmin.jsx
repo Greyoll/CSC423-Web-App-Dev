@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { parseJwt, handleLogout } from '../hooks/useLogin';
+import UserManagementViewAdmin from './UserManagementViewAdmin.jsx';
+import DashboardAdmin from './DashboardAdmin';
 
-function AppointmentViewAdmin({ onBack }) {
+function AppointmentViewAdmin() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,6 +16,7 @@ function AppointmentViewAdmin({ onBack }) {
     doctorId: "",
   });
   const [isCreating, setIsCreating] = useState(false);
+  const [currentPage, setCurrentPage] = useState("appointments");
 
   useEffect(() => {
     fetchAppointments();
@@ -131,6 +134,14 @@ function AppointmentViewAdmin({ onBack }) {
     }
   };
 
+  if (currentPage === "user management") {
+    return <UserManagementViewAdmin/>;
+  };
+
+  if (currentPage === "dashboard") {
+    return <DashboardAdmin/>;
+  };
+
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -139,13 +150,14 @@ function AppointmentViewAdmin({ onBack }) {
           <h1 className="nav-item">Admin Page</h1>
         </div>
         <nav className="nav-menu">
-          <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>Dashboard</a>
+          <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); setCurrentPage("dashboard")}}>Dashboard</a>
           <a className="nav-item" href="#">Patient Records</a>
           <a className="nav-item active" href="#">Appointments</a>
           <a className="nav-item" href="#">Prescriptions</a>
           <a className="nav-item" href="#">Messages</a>
         </nav>
         <div className="settings">
+          <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); setCurrentPage("user management")}}>User Management</a>
           <a href="#">System Settings</a>
           <a href="#">Settings</a>
           <a href="#" onClick={handleLogout}>Logout</a>
