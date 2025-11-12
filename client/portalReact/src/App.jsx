@@ -1,99 +1,77 @@
-import { useState } from "react";
-import "./App.css";
+import { useState, useEffect } from 'react';
+import './App.css'
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("patient");
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Change Password State
-  const [showChangePassword, setShowChangePassword] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  setError("");
+  if (!username || !password) {
+    setError("Please enter both a username and a password");
+    return;
+  }
 
-  // ---------- LOGIN ----------
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  setIsLoading(true);
 
-    if (!username || !password || !role) {
-      alert("Please enter username, password, and select a role");
-      return;
-    }
+  try {
+    console.log("Attempting login with:", { username, password });
 
+    const response = await fetch("http://localhost:3000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    console.log("Response status:", response.status);
+
+    let data;
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, role }),
-      });
-
-      if (!response.ok) {
-        const errtext = await response.text();
-        alert("Failed to login: " + errtext);
-        return;
-      }
-
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
-      setRole(data.role);
-      setLoggedIn(true);
-    } catch (err) {
-      console.error(err);
-      alert("Error logging in");
+      data = await response.json(); // safer JSON parsing
+      console.log("Parsed JSON:", data);
+    } catch (jsonErr) {
+      const text = await response.text();
+      console.log("Response text (not JSON):", text);
+      throw new Error("Invalid server response, expected JSON");
     }
-  };
 
-  // ---------- CHANGE PASSWORD ----------
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-
-    if (!username) {
-      setMessage("Enter your username to change password");
+    if (!response.ok) {
+      setError(data.error || data.message || "Login failed");
       return;
     }
 
-    if (newPassword !== confirmPassword) {
-      setMessage("Passwords do not match");
-      return;
-    }
+    localStorage.setItem("token", data.token);
+    setRole(data.role);
+    setLoggedIn(true);
+  } catch (err) {
+    console.error("Login fetch error:", err);
+    setError(err.message || "Network error occurred");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-    try {
-      const res = await fetch(
-        "http://localhost:3000/api/users/change-password",
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, newPassword }),
-        }
-      );
+  if (role === "doctor" && loggedIn) {
+    return <DashboardDoctor />;
+  }
+  else if (role === "admin" && loggedIn) {
+    return <DashboardAdmin />;
+  }
+  else if (role === "patient" && loggedIn) {
+    return <DashboardPatient />;
+  }
 
-      const data = await res.json();
-      if (res.ok) {
-        setMessage("Password updated successfully!");
-        setNewPassword("");
-        setConfirmPassword("");
-        setShowChangePassword(false);
-      } else {
-        setMessage(data.message || "Error updating password");
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage("Server error");
-    }
-  };
-
-  // ---------- REDIRECT TO DASHBOARD ----------
-  if (role === "doctor" && loggedIn) return <DashboardDoctor />;
-  if (role === "admin" && loggedIn) return <DashboardAdmin />;
-  if (role === "patient" && loggedIn) return <DashboardPatient />;
-
-  // ---------- LOGIN + CHANGE PASSWORD UI ----------
   return (
     <>
       <header>
-        <div className="logo">Valdez <span>MD</span></div>
+        <div className="logo">
+            <img src="./Images/valdez_logo-black.jpg" alt="Valdez MD Logo Black" />
+          </div>
         <nav>
           <ul>
             <li><a href="#">Home</a></li>
@@ -110,80 +88,32 @@ function Login() {
           <p>Please sign in to see more:</p>
 
           <label htmlFor="role">I am a:</label>
-          <select
-            id="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="">Select Role</option>
+          <select id="role" name="role" value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="patient">Patient</option>
             <option value="doctor">Doctor</option>
             <option value="admin">Admin</option>
           </select>
 
           <form id="loginForm" onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
+            {error && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+            <label htmlFor="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Stanley" required value={username} onChange={(e) => setUsername(e.target.value)} />
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <label htmlFor="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="GMoney527" required value={password} onChange={(e) => setPassword(e.target.value)} />
 
-            <button type="submit">Log In</button>
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? 'Logging in...' : 'Log In'}
+            </button>
           </form>
-
-          <button
-            onClick={() => setShowChangePassword(true)}
-            className="forgot-password-btn"
-          >
-            Forgot/Change Password?
-          </button>
         </div>
 
-        {/* ---------- CHANGE PASSWORD POPUP ---------- */}
-        {showChangePassword && (
-          <div className="popup-overlay">
-            <div className="popup-form">
-              <button
-                className="close-btn"
-                onClick={() => setShowChangePassword(false)}
-              >
-                &times;
-              </button>
-              <h2>Change Password</h2>
-              <form onSubmit={handleChangePassword}>
-                <input
-                  type="password"
-                  placeholder="New Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="Confirm New Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-                <button type="submit">Update Password</button>
-                {message && <p className="status-message">{message}</p>}
-              </form>
-            </div>
-          </div>
-        )}
+        <div className="image-section">
+          <img src="/Images/Stan-login.jpg" alt="Valdez Family Medicine" />
+        </div>
       </main>
     </>
-  );
+  )
 }
 /* ------------------- DASHBOARDS ------------------- */
 

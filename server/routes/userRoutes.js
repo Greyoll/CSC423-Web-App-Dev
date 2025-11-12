@@ -1,20 +1,18 @@
 const express = require("express");
-const router = express.Router();
+const { createUser, getAllUsers, getUser, updateUser, deleteUser } = require("../controllers/userController");
 const tokenValidator = require("../middleware/tokenValidator");
-const userController = require("../controllers/userController");
 
-// Create user
-router.post("/", tokenValidator, userController.createUser);
+const router = express.Router();
+
+// Create user 
+router.post("/", tokenValidator, createUser);
 // Get all users
-router.get("/", tokenValidator, userController.getAllUsers);
-// Get specific user
-router.get("/:id", tokenValidator, userController.getUser);
+router.get("/", tokenValidator, getAllUsers);
+// Get specfic user
+router.get("/:id", tokenValidator, getUser);
 // Update user
-router.put("/:id", tokenValidator, userController.updateUser);
+router.put("/:id", tokenValidator, updateUser);
 // Delete user
-router.delete("/:id", tokenValidator, userController.deleteUser);
-// Change password
-router.put("/change-password", tokenValidator, userController.changePassword);
+router.delete("/:id", tokenValidator, deleteUser);
 
 module.exports = router;
-
