@@ -449,3 +449,73 @@ nav a {
 .sidebar .settings button.nav-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
+
+/* Change Password Section Styling */
+.change-password-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.password-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 420px;
+  text-align: center;
+}
+
+.password-card h2 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.password-card p {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+.password-card .form-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.password-card label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.password-card input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border 0.2s;
+}
+
+.password-card input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.change-btn {
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.change-btn:hover {
+  background-color: #0056b3;
+}

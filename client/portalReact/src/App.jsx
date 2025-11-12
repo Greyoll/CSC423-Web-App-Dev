@@ -43,6 +43,37 @@ function Login() {
     }
   };
 
+   // ---------- CHANGE PASSWORD ----------
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setMessage("Passwords do not match");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/users/change-password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, newPassword }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setMessage("Password updated successfully!");
+        setEmail("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        setMessage(data.message || "Error updating password");
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("Server error");
+    }
+  };
+
+
   if (role === "doctor" && loggedIn) {
     return <DashboardDoctor />;
   }
@@ -454,6 +485,11 @@ function DashboardPatient() {
   const [activePage, setActivePage] = useState("dashboard");
   const [userName] = useState("Paige");
 
+  // 🔹 New state for password change form
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [upcoming, setUpcoming] = useState([
     { id: 1, title: "Check Up", doctor: "Dr. Stanley Valdez", date: "04/20/2026 6:09AM" },
     { id: 2, title: "Retinal Exam", doctor: "Dr. Ryan F", date: "02/02/2027 5:00PM" },
@@ -473,6 +509,37 @@ function DashboardPatient() {
   function handleLogout() {
     localStorage.removeItem("token");
     window.location.reload();
+  }
+
+  async function handleChangePassword() {
+    if (newPassword !== confirmPassword) {
+      alert("New passwords do not match!");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/auth/change-password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ oldPassword, newPassword }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        alert("Error: " + data);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error changing password");
+    }
   }
 
   function NavItem({ page, label }) {
@@ -497,21 +564,28 @@ function DashboardPatient() {
           <NavItem page="schedule" label="Schedule Appointment" />
           <NavItem page="contact" label="Contact Doctor" />
           <NavItem page="refill" label="Refill Prescription" />
+          <NavItem page="settings" label="Change Password" />
         </nav>
         <div className="settings">
-          <a href="#">Settings</a>
           <button onClick={handleLogout} className="logout-btn">Logout</button>
         </div>
       </aside>
 
       <main className="main-content">
         <header className="main-header">
-          <h1>Dashboard</h1>
+          <h1>
+            {activePage === "dashboard" && "Dashboard"}
+            {activePage === "schedule" && "Schedule Appointment"}
+            {activePage === "contact" && "Contact Doctor"}
+            {activePage === "refill" && "Refill Prescription"}
+            {activePage === "settings" && "Account Settings"}
+          </h1>
           <div className="user-info">
             <span>Welcome, {userName}</span>
           </div>
         </header>
 
+        {/* ---------- Dashboard Section ---------- */}
         {activePage === "dashboard" && (
           <>
             <section className="appointments-section">
@@ -549,13 +623,16 @@ function DashboardPatient() {
           </>
         )}
 
+        {/* ---------- Other Pages ---------- */}
         {activePage === "schedule" && <h2>Schedule form goes here...</h2>}
         {activePage === "contact" && <h2>Message doctor form...</h2>}
         {activePage === "refill" && <h2>Refill request form...</h2>}
+
       </main>
     </div>
   );
 }
+
 
 
 function App() {
