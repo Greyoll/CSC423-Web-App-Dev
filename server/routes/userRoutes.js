@@ -1,23 +1,20 @@
-import express from "express";
-import { changePassword } from "../controllers/userController.js";
-import { verifyToken } from "../middleware/authMiddleware.js";
 const express = require("express");
-const { createUser, getAllUsers, getUser, updateUser, deleteUser } = require("../controllers/userController");
-const tokenValidator = require("../middleware/tokenValidator");
-
 const router = express.Router();
+const tokenValidator = require("../middleware/tokenValidator");
+const userController = require("../controllers/userController");
 
-// Create user 
-router.post("/", tokenValidator, createUser);
+// Create user
+router.post("/", tokenValidator, userController.createUser);
 // Get all users
-router.get("/", tokenValidator, getAllUsers);
-// Get specfic user
-router.get("/:id", tokenValidator, getUser);
+router.get("/", tokenValidator, userController.getAllUsers);
+// Get specific user
+router.get("/:id", tokenValidator, userController.getUser);
 // Update user
-router.put("/:id", tokenValidator, updateUser);
+router.put("/:id", tokenValidator, userController.updateUser);
 // Delete user
-router.delete("/:id", tokenValidator, deleteUser);
-//Change password route
-router.put("/change-password", verifyToken, changePassword);
-export default router;
+router.delete("/:id", tokenValidator, userController.deleteUser);
+// Change password
+router.put("/change-password", tokenValidator, userController.changePassword);
+
 module.exports = router;
+

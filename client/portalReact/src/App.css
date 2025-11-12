@@ -450,72 +450,97 @@ nav a {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Change Password Section Styling */
-.change-password-section {
+/* ---------- POPUP OVERLAY ---------- */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 40px;
+  z-index: 1000;
 }
 
-.password-card {
-  background-color: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  width: 420px;
+/* ---------- POPUP CARD ---------- */
+.popup-form {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  position: relative;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-family: 'Arial', sans-serif;
 }
 
-.password-card h2 {
-  color: #2c3e50;
-  margin-bottom: 15px;
-}
-
-.password-card p {
+/* ---------- CLOSE BUTTON ---------- */
+.popup-form .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
   color: #555;
-  font-size: 14px;
-  margin-bottom: 25px;
+  transition: color 0.2s;
 }
 
-.password-card .form-group {
-  text-align: left;
-  margin-bottom: 20px;
+.popup-form .close-btn:hover {
+  color: #000;
 }
 
-.password-card label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: #333;
+/* ---------- FORM TITLE ---------- */
+.popup-form h2 {
+  margin-bottom: 10px;
+  color: #2c3e50;
 }
 
-.password-card input {
+/* ---------- INPUTS ---------- */
+.popup-form input {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 0.8rem;
   border: 1px solid #ccc;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 1rem;
   transition: border 0.2s;
 }
 
-.password-card input:focus {
+.popup-form input:focus {
   border-color: #007bff;
   outline: none;
 }
 
-.change-btn {
+/* ---------- BUTTON ---------- */
+.popup-form button {
   width: 100%;
+  padding: 0.8rem;
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 12px;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 1rem;
   cursor: pointer;
   transition: background 0.3s;
 }
 
-.change-btn:hover {
+.popup-form button:hover {
   background-color: #0056b3;
 }
+
+/* ---------- STATUS MESSAGE ---------- */
+.status-message {
+  margin-top: 0.5rem;
+  color: green;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+

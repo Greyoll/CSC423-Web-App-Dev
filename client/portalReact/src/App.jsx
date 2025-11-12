@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -7,11 +7,18 @@ function Login() {
   const [role, setRole] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
 
+  // Change Password State
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
+
+  // ---------- LOGIN ----------
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!username || !password) {
-      alert("Please enter both a username and a password");
+    if (!username || !password || !role) {
+      alert("Please enter username, password, and select a role");
       return;
     }
 
@@ -19,7 +26,7 @@ function Login() {
       const response = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password, role }),
       });
 
       if (!response.ok) {
@@ -29,41 +36,45 @@ function Login() {
       }
 
       const data = await response.json();
-
-      // Saves JWT
       localStorage.setItem("token", data.token);
-
-      // redirect based on role
       setRole(data.role);
       setLoggedIn(true);
-
     } catch (err) {
       console.error(err);
-      alert(err);
+      alert("Error logging in");
     }
   };
 
-   // ---------- CHANGE PASSWORD ----------
+  // ---------- CHANGE PASSWORD ----------
   const handleChangePassword = async (e) => {
     e.preventDefault();
+
+    if (!username) {
+      setMessage("Enter your username to change password");
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       setMessage("Passwords do not match");
       return;
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/users/change-password", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, newPassword }),
-      });
+      const res = await fetch(
+        "http://localhost:3000/api/users/change-password",
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, newPassword }),
+        }
+      );
 
       const data = await res.json();
       if (res.ok) {
         setMessage("Password updated successfully!");
-        setEmail("");
         setNewPassword("");
         setConfirmPassword("");
+        setShowChangePassword(false);
       } else {
         setMessage(data.message || "Error updating password");
       }
@@ -73,17 +84,12 @@ function Login() {
     }
   };
 
+  // ---------- REDIRECT TO DASHBOARD ----------
+  if (role === "doctor" && loggedIn) return <DashboardDoctor />;
+  if (role === "admin" && loggedIn) return <DashboardAdmin />;
+  if (role === "patient" && loggedIn) return <DashboardPatient />;
 
-  if (role === "doctor" && loggedIn) {
-    return <DashboardDoctor />;
-  }
-  else if (role === "admin" && loggedIn) {
-    return <DashboardAdmin />;
-  }
-  else if (role === "patient" && loggedIn) {
-    return <DashboardPatient />;
-  }
-
+  // ---------- LOGIN + CHANGE PASSWORD UI ----------
   return (
     <>
       <header>
@@ -104,36 +110,87 @@ function Login() {
           <p>Please sign in to see more:</p>
 
           <label htmlFor="role">I am a:</label>
-          <select id="role" name="role">
+          <select
+            id="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="">Select Role</option>
             <option value="patient">Patient</option>
             <option value="doctor">Doctor</option>
-            <option value="staff">Staff</option>
+            <option value="admin">Admin</option>
           </select>
 
           <form id="loginForm" onSubmit={handleSubmit}>
-            <label htmlFor="username">Username:</label>
-            <input type="text" id="username" name="username" placeholder="Stanley" required value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
 
-            <label htmlFor="password">Password:</label>
-            <input type="password" id="password" name="password" placeholder="GMoney527" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
             <button type="submit">Log In</button>
           </form>
+
+          <button
+            onClick={() => setShowChangePassword(true)}
+            className="forgot-password-btn"
+          >
+            Forgot/Change Password?
+          </button>
         </div>
 
-        <div className="image-section">
-          <img src="/Images/Stan-login.jpg" alt="Valdez Family Medicine" />
-        </div>
+        {/* ---------- CHANGE PASSWORD POPUP ---------- */}
+        {showChangePassword && (
+          <div className="popup-overlay">
+            <div className="popup-form">
+              <button
+                className="close-btn"
+                onClick={() => setShowChangePassword(false)}
+              >
+                &times;
+              </button>
+              <h2>Change Password</h2>
+              <form onSubmit={handleChangePassword}>
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm New Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <button type="submit">Update Password</button>
+                {message && <p className="status-message">{message}</p>}
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </>
-  )
+  );
 }
+/* ------------------- DASHBOARDS ------------------- */
 
 function DashboardDoctor() {
   return (
     <>
       <div className="dashboard-container">
-
         <aside className="sidebar">
           <nav className="nav-menu">
             <a className="nav-item active" href="#">Dashboard</a>
@@ -197,32 +254,10 @@ function DashboardDoctor() {
               </div>
             </div>
           </section>
-
-          <section className="appointments-section">
-            <h2>New Messages</h2>
-            <div className="appointment-cards">
-              <div className="card">
-                <h1>From: John Doe</h1>
-                <h2>Subject: Question about medication</h2>
-                <p>Received: 10/14/2025</p>
-              </div>
-              <div className="card">
-                <h1>From: Sarah Connor</h1>
-                <h2>Subject: Appointment follow-up</h2>
-                <p>Received: 10/13/2025</p>
-              </div>
-              <div className="card">
-                <h1>From: Pharmacy Team</h1>
-                <h2>Subject: Prescription refill approval</h2>
-                <p>Received: 10/12/2025</p>
-              </div>
-            </div>
-          </section>
         </main>
-
       </div>
     </>
-  )
+  );
 }
 
 function DashboardAdmin() {
@@ -238,10 +273,9 @@ function DashboardAdmin() {
   });
 
   useEffect(() => {
-    if (showPopup) { fetchUsers(); }
+    if (showPopup) fetchUsers();
   }, [showPopup]);
 
-  // Fetches all users to edit/delete
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -250,16 +284,14 @@ function DashboardAdmin() {
       });
       const data = await res.json();
       setUsers(data);
-    } catch (err) {
+    } catch {
       alert("Couldn't fetch users");
     }
   };
 
-  // Saves changes into database
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log("Sending token:", token);
       const method = editingUser ? "PUT" : "POST";
       const url = editingUser
         ? `http://localhost:3000/api/users/${editingUser._id}`
@@ -268,13 +300,11 @@ function DashboardAdmin() {
       const payload = { ...formData };
       if (editingUser && !formData.password) delete payload.password;
 
-      console.log("Sending payload:", payload); // Debug
-
       const res = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + localStorage.getItem("token")
+          "Authorization": "Bearer " + token,
         },
         body: JSON.stringify(payload),
       });
@@ -297,7 +327,7 @@ function DashboardAdmin() {
       alert(editingUser ? "User updated successfully!" : "User added successfully!");
     } catch (err) {
       console.error(err);
-      alert("Error saving user. Check console for details.");
+      alert("Error saving user");
     }
   };
 
@@ -313,7 +343,6 @@ function DashboardAdmin() {
   return (
     <>
       <div className="dashboard-container">
-
         <aside className="sidebar">
           <div className="logo">
             <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
@@ -330,7 +359,6 @@ function DashboardAdmin() {
             <button className="nav-item" onClick={() => setShowPopup(true)}>
               User Management
             </button>
-            <a href="#">System Settings</a>
             <a href="#">Settings</a>
             <a href="#">Logout</a>
           </div>
@@ -409,16 +437,18 @@ function DashboardAdmin() {
                           <td>{u.role}</td>
                           <td>{new Date(u.lastLogin).toLocaleString()}</td>
                           <td>
-                            <button onClick={() => {
-                              setEditingUser(u);
-                              setFormData({
-                                firstName: u.firstName,
-                                lastName: u.lastName,
-                                username: u.username,
-                                role: u.role,
-                                password: "",
-                              });
-                            }}>
+                            <button
+                              onClick={() => {
+                                setEditingUser(u);
+                                setFormData({
+                                  firstName: u.firstName,
+                                  lastName: u.lastName,
+                                  username: u.username,
+                                  role: u.role,
+                                  password: "",
+                                });
+                              }}
+                            >
                               Edit
                             </button>
                             <button onClick={() => handleDelete(u._id)}>Delete</button>
@@ -431,71 +461,20 @@ function DashboardAdmin() {
               </div>
             </div>
           )}
-
-          <section className="appointments-section">
-            <h2>Recent Patient Updates</h2>
-            <div className="appointment-cards">
-              <div className="card">
-                <h1>Jane Foster</h1>
-                <h2>New Lab Results Available</h2>
-                <p>Uploaded: 10/12/2025</p>
-              </div>
-              <div className="card">
-                <h1>Peter Parker</h1>
-                <h2>Medication Adjustment Submitted</h2>
-                <p>Submitted: 10/13/2025</p>
-              </div>
-              <div className="card">
-                <h1>Tony Stark</h1>
-                <h2>Cardiology Referral Sent</h2>
-                <p>Updated: 10/10/2025</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="appointments-section">
-            <h2>New Messages</h2>
-            <div className="appointment-cards">
-              <div className="card">
-                <h1>From: John Doe</h1>
-                <h2>Subject: Question about medication</h2>
-                <p>Received: 10/14/2025</p>
-              </div>
-              <div className="card">
-                <h1>From: Sarah Connor</h1>
-                <h2>Subject: Appointment follow-up</h2>
-                <p>Received: 10/13/2025</p>
-              </div>
-              <div className="card">
-                <h1>From: Pharmacy Team</h1>
-                <h2>Subject: Prescription refill approval</h2>
-                <p>Received: 10/12/2025</p>
-              </div>
-            </div>
-          </section>
         </main>
-
       </div>
     </>
-  )
+  );
 }
-
 
 function DashboardPatient() {
   const [activePage, setActivePage] = useState("dashboard");
   const [userName] = useState("Paige");
-
-  // 🔹 New state for password change form
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
   const [upcoming, setUpcoming] = useState([
     { id: 1, title: "Check Up", doctor: "Dr. Stanley Valdez", date: "04/20/2026 6:09AM" },
     { id: 2, title: "Retinal Exam", doctor: "Dr. Ryan F", date: "02/02/2027 5:00PM" },
     { id: 3, title: "GI Appointment", doctor: "Dr. Collin F", date: "08/30/2027 8:00AM" },
   ]);
-
   const history = [
     { title: "Blood Test", doctor: "Dr. Stanley Valdez", date: "04/20/2022 6:09AM" },
     { title: "Physical", doctor: "Dr. Jenny E", date: "07/07/2023 7:50AM" },
@@ -509,37 +488,6 @@ function DashboardPatient() {
   function handleLogout() {
     localStorage.removeItem("token");
     window.location.reload();
-  }
-
-  async function handleChangePassword() {
-    if (newPassword !== confirmPassword) {
-      alert("New passwords do not match!");
-      return;
-    }
-
-    try {
-      const res = await fetch("http://localhost:3000/api/auth/change-password", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify({ oldPassword, newPassword }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        alert(data.message);
-        setOldPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-      } else {
-        alert("Error: " + data);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error changing password");
-    }
   }
 
   function NavItem({ page, label }) {
@@ -564,7 +512,6 @@ function DashboardPatient() {
           <NavItem page="schedule" label="Schedule Appointment" />
           <NavItem page="contact" label="Contact Doctor" />
           <NavItem page="refill" label="Refill Prescription" />
-          <NavItem page="settings" label="Change Password" />
         </nav>
         <div className="settings">
           <button onClick={handleLogout} className="logout-btn">Logout</button>
@@ -578,14 +525,12 @@ function DashboardPatient() {
             {activePage === "schedule" && "Schedule Appointment"}
             {activePage === "contact" && "Contact Doctor"}
             {activePage === "refill" && "Refill Prescription"}
-            {activePage === "settings" && "Account Settings"}
           </h1>
           <div className="user-info">
             <span>Welcome, {userName}</span>
           </div>
         </header>
 
-        {/* ---------- Dashboard Section ---------- */}
         {activePage === "dashboard" && (
           <>
             <section className="appointments-section">
@@ -622,21 +567,14 @@ function DashboardPatient() {
             </section>
           </>
         )}
-
-        {/* ---------- Other Pages ---------- */}
-        {activePage === "schedule" && <h2>Schedule form goes here...</h2>}
-        {activePage === "contact" && <h2>Message doctor form...</h2>}
-        {activePage === "refill" && <h2>Refill request form...</h2>}
-
       </main>
     </div>
   );
 }
 
-
-
+/* ------------------- APP ENTRY ------------------- */
 function App() {
   return <Login />;
 }
 
-export default App
+export default App;
