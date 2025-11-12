@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css'
 
 function Login() {
+  // --- Login states ---
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("patient");
@@ -9,69 +10,69 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-const handleSubmit = async (event) => {
-  event.preventDefault();
-  setError("");
-  if (!username || !password) {
-    setError("Please enter both a username and a password");
-    return;
-  }
+  // --- Change Password popup states ---
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    username: "",
+    currentPassword: "",
+    newPassword: "",
+  });
+  const [passError, setPassError] = useState("");
+  const [passSuccess, setPassSuccess] = useState("");
 
-  setIsLoading(true);
-
-  try {
-    console.log("Attempting login with:", { username, password });
-
-    const response = await fetch("http://localhost:3000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-
-    console.log("Response status:", response.status);
-
-    let data;
-    try {
-      data = await response.json(); // safer JSON parsing
-      console.log("Parsed JSON:", data);
-    } catch (jsonErr) {
-      const text = await response.text();
-      console.log("Response text (not JSON):", text);
-      throw new Error("Invalid server response, expected JSON");
-    }
-
-    if (!response.ok) {
-      setError(data.error || data.message || "Login failed");
+  // --- Handle login ---
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    if (!username || !password) {
+      setError("Please enter both a username and a password");
       return;
     }
 
-    localStorage.setItem("token", data.token);
-    setRole(data.role);
-    setLoggedIn(true);
-  } catch (err) {
-    console.error("Login fetch error:", err);
-    setError(err.message || "Network error occurred");
-  } finally {
-    setIsLoading(false);
-  }
-};
+    setIsLoading(true);
 
-  if (role === "doctor" && loggedIn) {
-    return <DashboardDoctor />;
-  }
-  else if (role === "admin" && loggedIn) {
-    return <DashboardAdmin />;
-  }
-  else if (role === "patient" && loggedIn) {
-    return <DashboardPatient />;
-  }
+    try {
+      const response = await fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || data.message || "Login failed");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      setRole(data.role);
+      setLoggedIn(true);
+    } catch (err) {
+      console.error("Login fetch error:", err);
+      setError(err.message || "Network error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --- Handle logout ---
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
+
+  // --- Login page rendering ---
+  if (role === "doctor" && loggedIn) return <DashboardDoctor />;
+  if (role === "admin" && loggedIn) return <DashboardAdmin />;
+  if (role === "patient" && loggedIn) return <DashboardPatient />;
 
   return (
     <>
       <header>
         <div className="logo">
-            <img src="./Images/valdez_logo-black.jpg" alt="Valdez MD Logo Black" />
-          </div>
+          <img src="./Images/valdez_logo-black.jpg" alt="Valdez MD Logo Black" />
+        </div>
         <nav>
           <ul>
             <li><a href="#">Home</a></li>
@@ -96,25 +97,115 @@ const handleSubmit = async (event) => {
 
           <form id="loginForm" onSubmit={handleSubmit}>
             {error && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+
             <label htmlFor="username">Username:</label>
-            <input type="text" id="username" name="username" placeholder="Stanley" required value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Stanley"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
 
             <label htmlFor="password">Password:</label>
-            <input type="password" id="password" name="password" placeholder="GMoney527" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="GMoney527"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
             <button type="submit" disabled={isLoading}>
               {isLoading ? 'Logging in...' : 'Log In'}
             </button>
           </form>
+
+          {/* Change Password Button */}
+          <button
+            type="button"
+            onClick={() => setShowChangePassword(true)}
+            style={{ marginTop: "10px" }}
+          >
+            Change Password
+          </button>
         </div>
 
         <div className="image-section">
           <img src="/Images/Stan-login.jpg" alt="Valdez Family Medicine" />
         </div>
       </main>
+
+      {/* Change Password Popup */}
+      {showChangePassword && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <button className="close-btn" onClick={() => setShowChangePassword(false)}>X</button>
+            <h2>Change Password</h2>
+
+            {passError && <p style={{ color: 'red' }}>{passError}</p>}
+            {passSuccess && <p style={{ color: 'green' }}>{passSuccess}</p>}
+
+            <input
+              type="text"
+              placeholder="Username"
+              value={passwordData.username}
+              onChange={(e) => setPasswordData({ ...passwordData, username: e.target.value })}
+            />
+            <input
+              type="password"
+              placeholder="Current Password"
+              value={passwordData.currentPassword}
+              onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+            />
+            <input
+              type="password"
+              placeholder="New Password"
+              value={passwordData.newPassword}
+              onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+            />
+
+            <button onClick={async () => {
+              setPassError("");
+              setPassSuccess("");
+
+              const { username, currentPassword, newPassword } = passwordData;
+              if (!username || !currentPassword || !newPassword) {
+                setPassError("Please fill out all fields");
+                return;
+              }
+
+              try {
+                const res = await fetch("http://localhost:3000/api/users/change-password-login", {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(passwordData)
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                  setPassError(data.message || "Failed to change password");
+                } else {
+                  setPassSuccess(data.message || "Password changed successfully!");
+                  setPasswordData({ username: "", currentPassword: "", newPassword: "" });
+                }
+              } catch (err) {
+                setPassError("Network error: " + err.message);
+              }
+            }}>
+              Submit
+            </button>
+          </div>
+        </div>
+      )}
     </>
-  )
+  );
 }
+
 /* ------------------- DASHBOARDS ------------------- */
 
 function DashboardDoctor() {
