@@ -81,33 +81,21 @@ const handleSubmit = async (event) => {
           </ul>
         </nav>
       </header>
-
       <main className="main-container">
         <div className="login-section">
           <h1>Valdez M.D Family Medicine</h1>
-          <p>Please sign in to see more:</p>
-
-          <label htmlFor="role">I am a:</label>
-          <select id="role" name="role" value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="patient">Patient</option>
-            <option value="doctor">Doctor</option>
-            <option value="admin">Admin</option>
-          </select>
-
+          <p>Login:</p>
           <form id="loginForm" onSubmit={handleSubmit}>
             {error && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <label htmlFor="username">Username:</label>
             <input type="text" id="username" name="username" placeholder="Stanley" required value={username} onChange={(e) => setUsername(e.target.value)} />
-
             <label htmlFor="password">Password:</label>
             <input type="password" id="password" name="password" placeholder="GMoney527" required value={password} onChange={(e) => setPassword(e.target.value)} />
-
             <button type="submit" disabled={isLoading}>
               {isLoading ? 'Logging in...' : 'Log In'}
             </button>
           </form>
         </div>
-
         <div className="image-section">
           <img src="/Images/Stan-login.jpg" alt="Valdez Family Medicine" />
         </div>
@@ -117,15 +105,42 @@ const handleSubmit = async (event) => {
 }
 
 function DashboardDoctor() {
-  const [currentPage, setCurrentPage] = useState("dashboard"); // Track which page to show
+  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const payload = parseJwt(token);
+        const userId = payload.id;
+
+        const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setAppointments(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   if (currentPage === "appointments") {
-    return <DoctorAppointmentView onBack={() => setCurrentPage("dashboard")} />;
+    return <AppointmentViewDoctor onBack={() => setCurrentPage("dashboard")} />;
   }
+
   return (
     <>
       <div className="dashboard-container">
-
         <aside className="sidebar">
           <div className="logo">
             <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
@@ -142,7 +157,6 @@ function DashboardDoctor() {
             <a href="#" onClick={handleLogout}>Logout</a>
           </div>
         </aside>
-
         <main className="main-content">
           <header className="main-header">
             <h1>Doctor Dashboard</h1>
@@ -150,28 +164,24 @@ function DashboardDoctor() {
               <span>Dr. Stanley Valdez</span>
             </div>
           </header>
-
           <section className="appointments-section">
             <h2>Today's Appointments</h2>
             <div className="appointment-cards">
-              <div className="card">
-                <h1>Patient: John Doe</h1>
-                <h2>Reason: Annual Check-Up</h2>
-                <p>8:30 AM - Exam Room 1</p>
-              </div>
-              <div className="card">
-                <h1>Patient: Sarah Connor</h1>
-                <h2>Reason: Follow-Up Consultation</h2>
-                <p>10:00 AM - Exam Room 2</p>
-              </div>
-              <div className="card">
-                <h1>Patient: Michael Smith</h1>
-                <h2>Reason: Lab Review</h2>
-                <p>1:30 PM - Virtual</p>
-              </div>
+              {loading ? (
+                <p>Loading appointments...</p>
+              ) : appointments.length === 0 ? (
+                <p>No appointments scheduled.</p>
+              ) : (
+                appointments.map((apt) => (
+                  <div className="card" key={apt._id || apt.id}>
+                    <h1>Patient ID: {apt.patientId}</h1>
+                    <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                    <p>{apt.startTime} - {apt.endTime}</p>
+                  </div>
+                ))
+              )}
             </div>
           </section>
-
           <section className="appointments-section">
             <h2>Recent Patient Updates</h2>
             <div className="appointment-cards">
@@ -192,7 +202,6 @@ function DashboardDoctor() {
               </div>
             </div>
           </section>
-
           <section className="appointments-section">
             <h2>New Messages</h2>
             <div className="appointment-cards">
@@ -214,7 +223,6 @@ function DashboardDoctor() {
             </div>
           </section>
         </main>
-
       </div>
     </>
   )
@@ -224,6 +232,8 @@ function DashboardAdmin() {
   const [showPopup, setShowPopup] = useState(false);
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [loadingAppts, setLoadingAppts] = useState(true);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -233,10 +243,35 @@ function DashboardAdmin() {
   });
 
   useEffect(() => {
+    // Fetch appointments on mount
+    const fetchAppointments = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const payload = parseJwt(token);
+        const userId = payload.id;
+
+        const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setAppointments(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      } finally {
+        setLoadingAppts(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  useEffect(() => {
     if (showPopup) { fetchUsers(); }
   }, [showPopup]);
 
-  // Fetches all users to edit/delete
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -250,11 +285,9 @@ function DashboardAdmin() {
     }
   };
 
-  // Saves changes into database
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log("Sending token:", token);
       const method = editingUser ? "PUT" : "POST";
       const url = editingUser
         ? `http://localhost:3000/api/users/${editingUser._id}`
@@ -262,8 +295,6 @@ function DashboardAdmin() {
 
       const payload = { ...formData };
       if (editingUser && !formData.password) delete payload.password;
-
-      console.log("Sending payload:", payload); // Debug
 
       const res = await fetch(url, {
         method,
@@ -305,16 +336,15 @@ function DashboardAdmin() {
     fetchUsers();
   };
 
-  const [currentPage, setCurrentPage] = useState("dashboard"); // Track which page to show
+  const [currentPage, setCurrentPage] = useState("dashboard");
 
   if (currentPage === "appointments") {
-    return <AdminAppointmentView onBack={() => setCurrentPage("dashboard")} />;
+    return <AppointmentViewAdmin onBack={() => setCurrentPage("dashboard")} />;
   }
 
   return (
     <>
       <div className="dashboard-container">
-
         <aside className="sidebar">
           <div className="logo">
             <img src="./Images/Logo_White.png" alt="Valdez MD Logo White" />
@@ -336,7 +366,6 @@ function DashboardAdmin() {
             <a href="#" onClick={handleLogout}>Logout</a>
           </div>
         </aside>
-
         <main className="main-content">
           <header className="main-header">
             <h1>Admin Dashboard</h1>
@@ -344,7 +373,6 @@ function DashboardAdmin() {
               <span>Admin</span>
             </div>
           </header>
-
           {showPopup && (
             <div className="popup-overlay">
               <div className="popup">
@@ -388,7 +416,6 @@ function DashboardAdmin() {
                     {editingUser ? "Update User" : "Add User"}
                   </button>
                 </div>
-
                 <div className="table-section">
                   <table>
                     <thead>
@@ -434,26 +461,23 @@ function DashboardAdmin() {
           )}
 
           <section className="appointments-section">
-            <h2>Recent Patient Updates</h2>
+            <h2>Recent Appointments</h2>
             <div className="appointment-cards">
-              <div className="card">
-                <h1>Jane Foster</h1>
-                <h2>New Lab Results Available</h2>
-                <p>Uploaded: 10/12/2025</p>
-              </div>
-              <div className="card">
-                <h1>Peter Parker</h1>
-                <h2>Medication Adjustment Submitted</h2>
-                <p>Submitted: 10/13/2025</p>
-              </div>
-              <div className="card">
-                <h1>Tony Stark</h1>
-                <h2>Cardiology Referral Sent</h2>
-                <p>Updated: 10/10/2025</p>
-              </div>
+              {loadingAppts ? (
+                <p>Loading appointments...</p>
+              ) : appointments.length === 0 ? (
+                <p>No appointments found.</p>
+              ) : (
+                appointments.slice(0, 3).map((apt) => (
+                  <div className="card" key={apt._id || apt.id}>
+                    <h1>Appointment #{apt.id}</h1>
+                    <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                    <p>{apt.startTime} - {apt.endTime}</p>
+                  </div>
+                ))
+              )}
             </div>
           </section>
-
           <section className="appointments-section">
             <h2>New Messages</h2>
             <div className="appointment-cards">
@@ -475,18 +499,45 @@ function DashboardAdmin() {
             </div>
           </section>
         </main>
-
       </div>
     </>
   )
 }
 
 function DashboardPatient() {
-  const [currentPage, setCurrentPage] = useState("dashboard"); // Track which page to show
+  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const payload = parseJwt(token);
+        const userId = payload.id;
+
+        const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setAppointments(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   if (currentPage === "appointments") {
     return <AppointmentView onBack={() => setCurrentPage("dashboard")} />;
   }
+
   return (
     <>
       <div className="dashboard-container">
@@ -506,7 +557,6 @@ function DashboardPatient() {
             <a href="#" onClick={handleLogout}>Logout</a>
           </div>
         </aside>
-
         <main className="main-content">
           <header className="main-header">
             <h1>Dashboard</h1>
@@ -514,28 +564,24 @@ function DashboardPatient() {
               <span>Patient Name</span>
             </div>
           </header>
-
           <section className="appointments-section">
             <h2>Upcoming Appointments</h2>
             <div className="appointment-cards">
-              <div className="card">
-                <h1>Check Up</h1>
-                <h2>Dr. Stanley Valdez</h2>
-                <p>04/20/2026 6:09AM</p>
-              </div>
-              <div className="card">
-                <h1>Retinal Exam</h1>
-                <h2>Dr. Ryan F</h2>
-                <p>02/02/2027 5:00PM</p>
-              </div>
-              <div className="card">
-                <h1>GI Appointment</h1>
-                <h2>Dr. Collin F</h2>
-                <p>08/30/2127 8:00AM</p>
-              </div>
+              {loading ? (
+                <p>Loading appointments...</p>
+              ) : appointments.length === 0 ? (
+                <p>No appointments scheduled.</p>
+              ) : (
+                appointments.map((apt) => (
+                  <div className="card" key={apt._id || apt.id}>
+                    <h1>Appointment #{apt.id}</h1>
+                    <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                    <p>{apt.startTime} - {apt.endTime}</p>
+                  </div>
+                ))
+              )}
             </div>
           </section>
-
           <section className="appointments-section">
             <h2>Appointment History</h2>
             <div className="appointment-cards">
@@ -557,13 +603,12 @@ function DashboardPatient() {
             </div>
           </section>
         </main>
-
       </div>
     </>
   )
 }
 
-function DoctorAppointmentView({ onBack }) {
+function AppointmentViewDoctor({ onBack }) {
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -579,7 +624,7 @@ function DoctorAppointmentView({ onBack }) {
           </nav>
           <div className="settings">
               <a href="#">Settings</a>
-              <a href="#">Logout</a>
+              <a href="#" onClick={handleLogout}>Logout</a>
           </div>
       </aside>
 
@@ -637,7 +682,135 @@ function DoctorAppointmentView({ onBack }) {
   );
 }
 
-function AdminAppointmentView({ onBack }) {
+// Replace the AppointmentViewAdmin function with this:
+function AppointmentViewAdmin({ onBack }) {
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [formData, setFormData] = useState({
+    date: "",
+    startTime: "",
+    endTime: "",
+    patientId: "",
+    doctorId: "",
+  });
+  const [isCreating, setIsCreating] = useState(false);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const payload = parseJwt(token);
+      const userId = payload.id;
+
+      const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        setError("Failed to fetch appointments: " + errText);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Fetched appointments:", data);
+      setAppointments(Array.isArray(data) ? data : []);
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      setError("Error fetching appointments: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddAppointment = async () => {
+    // Validate form
+    if (!formData.date || !formData.startTime || !formData.endTime || !formData.patientId || !formData.doctorId) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    try {
+      setIsCreating(true);
+      const token = localStorage.getItem("token");
+
+      const payload = {
+        date: formData.date,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        patientId: Number(formData.patientId),
+        doctorId: Number(formData.doctorId),
+      };
+
+      const res = await fetch("http://localhost:3000/api/appointments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        alert("Failed to create appointment: " + errText);
+        return;
+      }
+
+      const data = await res.json();
+      alert("Appointment created successfully!");
+      
+      // Reset form and refresh list
+      setFormData({
+        date: "",
+        startTime: "",
+        endTime: "",
+        patientId: "",
+        doctorId: "",
+      });
+      setShowAddForm(false);
+      fetchAppointments();
+    } catch (err) {
+      console.error(err);
+      alert("Error creating appointment: " + err.message);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleDeleteAppointment = async (appointmentId) => {
+    if (!window.confirm("Are you sure you want to delete this appointment?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        alert("Failed to delete appointment: " + errText);
+        return;
+      }
+
+      alert("Appointment deleted successfully!");
+      fetchAppointments();
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting appointment: " + err.message);
+    }
+  };
+
   return (
     <>
       <div className="dashboard-container">
@@ -654,14 +827,12 @@ function AdminAppointmentView({ onBack }) {
             <a className="nav-item" href="#">Messages</a>
           </nav>
           <div className="settings">
-            <button className="nav-item" onClick={() => setShowPopup(true)}>
-              User Management
-            </button>
             <a href="#">System Settings</a>
             <a href="#">Settings</a>
-            <a href="#">Logout</a>
+            <a href="#" onClick={handleLogout}>Logout</a>
           </div>
         </aside>
+
         <main className="main-content">
           <header className="main-header">
             <h1>Admin Appointments</h1>
@@ -670,47 +841,96 @@ function AdminAppointmentView({ onBack }) {
             </div>
           </header>
 
-          <section className="appointments-section">
-            <h2>Upcoming Appointments</h2>
-            <div className="appointment-cards">
-              <div className="card">
-                <h1>Check Up</h1>
-                <h2>Dr. Stanley Valdez</h2>
-                <p>04/20/2026 6:09AM</p>
-              </div>
-              <div className="card">
-                <h1>Retinal Exam</h1>
-                <h2>Dr. Ryan F</h2>
-                <p>02/02/2027 5:00PM</p>
-              </div>
-              <div className="card">
-                <h1>GI Appointment</h1>
-                <h2>Dr. Collin F</h2>
-                <p>08/30/2127 8:00AM</p>
-              </div>
-            </div>
-          </section>
+          <button 
+            onClick={() => setShowAddForm(!showAddForm)}
+            style={{ marginBottom: '20px', padding: '10px 20px', cursor: 'pointer' }}
+          >
+            {showAddForm ? "Cancel" : "Add New Appointment"}
+          </button>
 
-          <section className="appointments-section">
-            <h2>Appointment History</h2>
-            <div className="appointment-cards">
-              <div className="card">
-                <h1>Blood Test</h1>
-                <h2>Dr. Stanley Valdez</h2>
-                <p>04/20/2022 06:09AM</p>
-              </div>
-              <div className="card">
-                <h1>Physical</h1>
-                <h2>Dr. Jenny E</h2>
-                <p>07/07/2023 07:50AM</p>
-              </div>
-              <div className="card">
-                <h1>General Wellness</h1>
-                <h2>Dr. James H</h2>
-                <p>12/30/2023 08:00AM</p>
+          {showAddForm && (
+            <div className="popup-overlay">
+              <div className="popup">
+                <button className="close-btn" onClick={() => setShowAddForm(false)}>X</button>
+                <h2>Create New Appointment</h2>
+
+                <div className="form-section">
+                  <label>Date:</label>
+                  <input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  />
+
+                  <label>Start Time:</label>
+                  <input
+                    type="time"
+                    value={formData.startTime}
+                    onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                  />
+
+                  <label>End Time:</label>
+                  <input
+                    type="time"
+                    value={formData.endTime}
+                    onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                  />
+
+                  <label>Patient ID:</label>
+                  <input
+                    type="number"
+                    placeholder="Enter patient ID"
+                    value={formData.patientId}
+                    onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
+                  />
+
+                  <label>Doctor ID:</label>
+                  <input
+                    type="number"
+                    placeholder="Enter doctor ID"
+                    value={formData.doctorId}
+                    onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
+                  />
+
+                  <button onClick={handleAddAppointment} disabled={isCreating}>
+                    {isCreating ? "Creating..." : "Create Appointment"}
+                  </button>
+                </div>
               </div>
             </div>
-          </section>
+          )}
+
+          {loading && <p style={{ padding: '20px' }}>Loading appointments...</p>}
+
+          {error && <p style={{ padding: '20px', color: 'red' }}>Error: {error}</p>}
+
+          {!loading && !error && appointments.length === 0 && (
+            <p style={{ padding: '20px' }}>No appointments found.</p>
+          )}
+
+          {!loading && !error && appointments.length > 0 && (
+            <section className="appointments-section">
+              <h2>All Appointments</h2>
+              <div className="appointment-cards">
+                {appointments.map((apt) => (
+                  <div className="card" key={apt._id || apt.id}>
+                    <h1>Appointment #{apt.id}</h1>
+                    <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                    <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
+                    <p><strong>Patient ID:</strong> {apt.patientId}</p>
+                    <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
+                    <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString()}</p>
+                    <button 
+                      onClick={() => handleDeleteAppointment(apt.id)}
+                      style={{ marginTop: '10px', backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </main>
       </div>
     </>
@@ -718,6 +938,41 @@ function AdminAppointmentView({ onBack }) {
 }
 
 function AppointmentView({ onBack }) {
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const payload = parseJwt(token);
+        const userId = payload.id;
+        // Fetch appointments for this user
+        const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          setError("Failed to fetch appointments: " + errText);
+          setLoading(false);
+          return;
+        }
+
+        const data = await res.json();
+        setAppointments(Array.isArray(data) ? data : []);
+        setError(null);
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching appointments: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAppointments();
+  }, []);
+
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -733,63 +988,60 @@ function AppointmentView({ onBack }) {
           </nav>
           <div className="settings">
               <a href="#">Settings</a>
-              <a href="#">Logout</a>
+              <a href="#" onClick={handleLogout}>Logout</a>
           </div>
       </aside>
-
       <main className="main-content">
         <header className="main-header">
-          <h1>Appointments</h1>
+          <h1>All Appointments</h1>
           <div className="user-info">
             <span>Patient Name</span>
           </div>
         </header>
 
-        <section className="appointments-section">
-          <h2>Upcoming Appointments</h2>
-          <div className="appointment-cards">
-            <div className="card">
-              <h1>Check Up</h1>
-              <h2>Dr. Stanley Valdez</h2>
-              <p>04/20/2026 6:09AM</p>
-            </div>
-            <div className="card">
-              <h1>Retinal Exam</h1>
-              <h2>Dr. Ryan F</h2>
-              <p>02/02/2027 5:00PM</p>
-            </div>
-            <div className="card">
-              <h1>GI Appointment</h1>
-              <h2>Dr. Collin F</h2>
-              <p>08/30/2127 8:00AM</p>
-            </div>
-          </div>
-        </section>
+        {loading && <p style={{ padding: '20px' }}>Loading appointments...</p>}
+        
+        {error && <p style={{ padding: '20px', color: 'red' }}>Error: {error}</p>}
 
-        <section className="appointments-section">
-          <h2>Appointment History</h2>
-          <div className="appointment-cards">
-            <div className="card">
-              <h1>Blood Test</h1>
-              <h2>Dr. Stanley Valdez</h2>
-              <p>04/20/2022 06:09AM</p>
+        {!loading && !error && appointments.length === 0 && (
+          <p style={{ padding: '20px' }}>No appointments found.</p>
+        )}
+
+        {!loading && !error && appointments.length > 0 && (
+          <section className="appointments-section">
+            <h2>Your Appointments</h2>
+            <div className="appointment-cards">
+              {appointments.map((apt) => (
+                <div className="card" key={apt._id || apt.id}>
+                  <h1>Appointment #{apt.id}</h1>
+                  <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                  <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
+                  <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
+                  <p><strong>Patient ID:</strong> {apt.patientId}</p>
+                  <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString()}</p>
+                </div>
+              ))}
             </div>
-            <div className="card">
-              <h1>Physical</h1>
-              <h2>Dr. Jenny E</h2>
-              <p>07/07/2023 07:50AM</p>
-            </div>
-            <div className="card">
-              <h1>General Wellness</h1>
-              <h2>Dr. James H</h2>
-              <p>12/30/2023 08:00AM</p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
     </div>
   )
 }
+
+function parseJwt(token) {
+  try {
+    const b64 = token.split('.')[1];
+    const base64 = b64.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
+
 const handleLogout = () => {
   localStorage.removeItem("token");
   window.location.href = "/";
