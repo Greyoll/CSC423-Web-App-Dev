@@ -14,5 +14,7 @@ router.get("/:id", tokenValidator, getUser);
 router.put("/:id", tokenValidator, updateUser);
 // Delete user
 router.delete("/:id", tokenValidator, deleteUser);
+// Change password for logged-in user
+router.put("/change-password", tokenValidator, changePassword);
 
 module.exports = router;
