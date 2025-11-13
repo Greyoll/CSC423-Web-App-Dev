@@ -1,6 +1,15 @@
 {
-  "dependencies": {
-    "chokidar": "^4.0.3",
-    "package.json": "^0.0.0"
+  "name": "valdez-medical-portal",
+  "version": "1.0.0",
+  "description": "Medical portal with React frontend and Node.js backend",
+  "scripts": {
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm run server\" \"npm run client\"",
+    "server": "cd server && nodemon index.js",
+    "client": "cd client/portalReact && npm run dev",
+    "install-all": "cd server && npm install && cd ../client/portalReact && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "nodemon": "^3.1.0"
   }
 }
