@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 export function parseJwt(token) {
   try {
     const b64 = token.split('.')[1];
@@ -12,7 +14,17 @@ export function parseJwt(token) {
   }
 }
 
+export const useHandleLogout = () => {
+  const navigate = useNavigate();
+  
+  return () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+};
+
+// For components that can't use hooks
 export const handleLogout = () => {
   localStorage.removeItem("token");
-  window.location.href = "/";
+  window.location.href = "/login";
 };
