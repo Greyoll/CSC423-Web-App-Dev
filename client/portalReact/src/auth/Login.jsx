@@ -1,10 +1,20 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-function Login({ onLoginSuccess }) {
+function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { login, isLoggedIn, userRole } = useAuth();
+
+  // Redirect if already logged in
+  if (isLoggedIn && userRole) {
+    navigate(`/${userRole}/dashboard`, { replace: true });
+    return null;
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -43,7 +53,10 @@ function Login({ onLoginSuccess }) {
       }
 
       localStorage.setItem("token", data.token);
-      onLoginSuccess(data.role);
+      login(data.role, data.token);
+      
+      // Navigate to the appropriate dashboard based on role
+      navigate(`/${data.role}/dashboard`);
     } catch (err) {
       console.error("Login fetch error:", err);
       setError(err.message || "Network error occurred");
