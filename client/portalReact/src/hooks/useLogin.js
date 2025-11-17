@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export function parseJwt(token) {
   try {
@@ -16,15 +17,10 @@ export function parseJwt(token) {
 
 export const useHandleLogout = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   
   return () => {
-    localStorage.removeItem("token");
+    logout();
     navigate("/login");
   };
-};
-
-// For components that can't use hooks
-export const handleLogout = () => {
-  localStorage.removeItem("token");
-  window.location.href = "/login";
 };
