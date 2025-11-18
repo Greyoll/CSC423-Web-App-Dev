@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 
 function DashboardAdmin() {
+  const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [loadingAppts, setLoadingAppts] = useState(true);
   const handleLogout = useHandleLogout();
@@ -17,6 +18,11 @@ function DashboardAdmin() {
           return;
         }
         const userId = payload.id;
+
+        // Set full name from JWT
+        const firstName = payload.firstName || "";
+        const lastName = payload.lastName || "";
+        setUserName(`${firstName} ${lastName}`.trim() || "User");
 
         const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -61,7 +67,7 @@ function DashboardAdmin() {
         <header className="main-header">
           <h1>Admin Dashboard</h1>
           <div className="user-info">
-            <span>Admin</span>
+            <span>{userName}</span>
           </div>
         </header>
         <section className="appointments-section">
