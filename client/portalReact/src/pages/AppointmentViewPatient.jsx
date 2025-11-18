@@ -58,7 +58,7 @@ function AppointmentViewPatient() {
           <a className="nav-item" href="#">Refill prescription</a>
         </nav>
         <div className="settings">
-          <a href="#">Settings</a>
+          <Link to="/settings">Settings</Link>
           <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
         </div>
       </aside>

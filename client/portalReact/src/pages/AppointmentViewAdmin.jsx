@@ -44,7 +44,6 @@ function AppointmentViewAdmin() {
       }
 
       const data = await res.json();
-      console.log("Fetched appointments:", data);
       setAppointments(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
@@ -150,7 +149,7 @@ function AppointmentViewAdmin() {
         <div className="settings">
           <Link className="nav-item" to="/admin/users">User Management</Link>
           <a href="#">System Settings</a>
-          <a href="#">Settings</a>
+          <Link to="/settings">Settings</Link>
           <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
         </div>
       </aside>

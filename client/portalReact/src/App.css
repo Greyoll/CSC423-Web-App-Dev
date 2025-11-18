@@ -600,3 +600,318 @@ nav a {
   font-weight: 500;
   color: #333;
 }
+
+/* =================================
+   SETTINGS PAGE STYLES
+   ================================= */
+.user-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-item label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.info-item p {
+  color: #000;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: #000;
+  color: white;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  width: fit-content;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.setting-info h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: #000;
+}
+
+.setting-info p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.settings-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.settings-button.secondary {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+.settings-button.secondary:hover {
+  background-color: #e0e0e0;
+}
+
+.settings-button.danger {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.settings-button.danger:hover {
+  background-color: #b71c1c;
+}
+
+/* =================================
+   TOGGLE SWITCH
+   ================================= */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: #000;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+/* =================================
+   DARK MODE STYLES
+   ================================= */
+body.dark-mode {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.dark-mode header {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.dark-mode nav a {
+  color: #e0e0e0;
+}
+
+.dark-mode .login-btn {
+  background-color: #e0e0e0;
+  color: #000000;
+}
+
+.dark-mode .main-container {
+  background-color: #1a1a1a;
+}
+
+.dark-mode .login-section {
+  background-color: #1a1a1a;
+}
+
+.dark-mode .login-section h1,
+.dark-mode .login-section p,
+.dark-mode .login-section label {
+  color: #e0e0e0;
+}
+
+.dark-mode .login-section input,
+.dark-mode .login-section select {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.dark-mode .login-section button {
+  background: #444;
+  color: #e0e0e0;
+}
+
+.dark-mode .login-section button:hover {
+  background: #555;
+}
+
+.dark-mode .main-content {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.dark-mode .main-header h1 {
+  color: #e0e0e0;
+}
+
+.dark-mode .user-info span {
+  color: #e0e0e0;
+}
+
+.dark-mode .appointments-section {
+  background-color: #2a2a2a;
+}
+
+.dark-mode .appointments-section h2 {
+  color: #e0e0e0;
+}
+
+.dark-mode .card {
+  background-color: #333;
+  color: #e0e0e0;
+}
+
+.dark-mode .card h1,
+.dark-mode .card h2 {
+  color: #e0e0e0;
+}
+
+.dark-mode .card p {
+  color: #b0b0b0;
+}
+
+.dark-mode .user-info-grid {
+  background-color: #2a2a2a;
+}
+
+.dark-mode .info-item label {
+  color: #b0b0b0;
+}
+
+.dark-mode .info-item p {
+  color: #e0e0e0;
+}
+
+.dark-mode .role-badge {
+  background-color: #e0e0e0;
+  color: #000;
+}
+
+.dark-mode .settings-group {
+  background-color: #2a2a2a;
+}
+
+.dark-mode .setting-item {
+  background-color: #333;
+  border-color: #444;
+}
+
+.dark-mode .setting-info h3 {
+  color: #e0e0e0;
+}
+
+.dark-mode .setting-info p {
+  color: #b0b0b0;
+}
+
+.dark-mode .settings-button.secondary {
+  background-color: #444;
+  color: #e0e0e0;
+}
+
+.dark-mode .settings-button.secondary:hover {
+  background-color: #555;
+}
+
+.dark-mode .popup {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+.dark-mode .popup h2 {
+  color: #e0e0e0;
+}
+
+.dark-mode .form-section input,
+.dark-mode .form-section select {
+  background-color: #333;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.dark-mode .form-section label {
+  color: #b0b0b0;
+}
+
+.dark-mode .table-section table {
+  background-color: #2a2a2a;
+}
+
+.dark-mode .table-section th {
+  background-color: #333;
+  color: #e0e0e0;
+}
+
+.dark-mode .table-section td {
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.dark-mode .table-section tr:hover {
+  background-color: #333;
+}

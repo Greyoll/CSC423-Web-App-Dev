@@ -8,15 +8,19 @@ import AppointmentViewPatient from './pages/AppointmentViewPatient';
 import AppointmentViewDoctor from './pages/AppointmentViewDoctor';
 import AppointmentViewAdmin from './pages/AppointmentViewAdmin';
 import UserManagementViewAdmin from './pages/UserManagementViewAdmin';
+import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ThemeProvider>
     </Router>
   );
 }
@@ -85,6 +89,16 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={['admin']}>
             <UserManagementViewAdmin />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Settings Route - Available to all authenticated users */}
+      <Route 
+        path="/settings" 
+        element={
+          <ProtectedRoute allowedRoles={['patient', 'doctor', 'admin']}>
+            <Settings />
           </ProtectedRoute>
         } 
       />
