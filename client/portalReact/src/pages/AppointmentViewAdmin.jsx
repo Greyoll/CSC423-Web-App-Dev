@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 
 function AppointmentViewAdmin() {
+  const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,6 +20,17 @@ function AppointmentViewAdmin() {
 
   useEffect(() => {
     fetchAppointments();
+  }, []);
+
+  // Use effect to get users name for display
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const payload = parseJwt(token);
+    if (payload) {
+        const firstName = payload.firstName || "";
+        const lastName = payload.lastName || "";
+        setUserName(`${firstName} ${lastName}`.trim() || "User");
+    };
   }, []);
 
   const fetchAppointments = async () => {
@@ -158,7 +170,7 @@ function AppointmentViewAdmin() {
         <header className="main-header">
           <h1>Admin Appointments</h1>
           <div className="user-info">
-            <span>Admin</span>
+            <span>{userName}</span>
           </div>
         </header>
 

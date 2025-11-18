@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 
 function DashboardDoctor() {
+  const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const handleLogout = useHandleLogout();
@@ -17,6 +18,11 @@ function DashboardDoctor() {
           return;
         }
         const userId = payload.id;
+
+        // Set full name from JWT
+        const firstName = payload.firstName || "";
+        const lastName = payload.lastName || "";
+        setUserName(`${firstName} ${lastName}`.trim() || "User");
 
         const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -58,7 +64,7 @@ function DashboardDoctor() {
         <header className="main-header">
           <h1>Doctor Dashboard</h1>
           <div className="user-info">
-            <span>Dr. Stanley Valdez</span>
+            <span>Dr. {userName}</span>
           </div>
         </header>
         <section className="appointments-section">

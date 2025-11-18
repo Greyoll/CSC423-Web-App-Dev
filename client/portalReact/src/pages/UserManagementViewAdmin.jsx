@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useHandleLogout } from '../hooks/useLogin';
+import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 
 function UserManagementViewAdmin(){
+    const [userName, setUserName] = useState("");
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
     const [formData, setFormData] = useState({
@@ -16,6 +17,17 @@ function UserManagementViewAdmin(){
 
     useEffect(() => {
         fetchUsers();
+    }, []);
+
+    // Use effect to get users name for display
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        const payload = parseJwt(token);
+        if (payload) {
+            const firstName = payload.firstName || "";
+            const lastName = payload.lastName || "";
+            setUserName(`${firstName} ${lastName}`.trim() || "User");
+        };
     }, []);
 
     const fetchUsers = async () => {
@@ -107,7 +119,7 @@ function UserManagementViewAdmin(){
                 <header className="main-header">
                     <h1>Admin Dashboard</h1>
                     <div className="user-info">
-                        <span>Admin</span>
+                        <span>{userName}</span>
                     </div>
                 </header>
                 <h2>User Management</h2>
