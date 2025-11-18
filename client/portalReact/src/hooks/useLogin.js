@@ -1,3 +1,6 @@
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
 export function parseJwt(token) {
   try {
     const b64 = token.split('.')[1];
@@ -12,7 +15,12 @@ export function parseJwt(token) {
   }
 }
 
-export const handleLogout = () => {
-  localStorage.removeItem("token");
-  window.location.href = "/";
+export const useHandleLogout = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  
+  return () => {
+    logout();
+    navigate("/login");
+  };
 };

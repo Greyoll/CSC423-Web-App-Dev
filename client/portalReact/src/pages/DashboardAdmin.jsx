@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import AppointmentViewAdmin from './AppointmentViewAdmin';
-import { parseJwt, handleLogout } from '../hooks/useLogin';
-import UserManagementViewAdmin from './UserManagementViewAdmin.jsx';
+import { Link } from 'react-router-dom';
+import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 
 function DashboardAdmin() {
   const [appointments, setAppointments] = useState([]);
   const [loadingAppts, setLoadingAppts] = useState(true);
-  const [currentPage, setCurrentPage] = useState("dashboard");
+  const handleLogout = useHandleLogout();
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -37,14 +36,6 @@ function DashboardAdmin() {
     fetchAppointments();
   }, []);
 
-  if (currentPage === "appointments") {
-    return <AppointmentViewAdmin/>;
-  };
-
-  if (currentPage === "user management") {
-    return <UserManagementViewAdmin/>;
-  };
-
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -53,17 +44,17 @@ function DashboardAdmin() {
           <h1 className="nav-item">Admin Page</h1>
         </div>
         <nav className="nav-menu">
-          <a className="nav-item active" href="#">Dashboard</a>
+          <Link className="nav-item active" to="/admin/dashboard">Dashboard</Link>
           <a className="nav-item" href="#">Patient Records</a>
-          <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); setCurrentPage("appointments"); }}>Appointments</a>
+          <Link className="nav-item" to="/admin/appointments">Appointments</Link>
           <a className="nav-item" href="#">Prescriptions</a>
           <a className="nav-item" href="#">Messages</a>
         </nav>
         <div className="settings">
-          <button className="nav-item" onClick={(e) => { e.preventDefault(); setCurrentPage("user management");}}>User Management</button>
+          <Link className="nav-item" to="/admin/users">User Management</Link>
           <a href="#">System Settings</a>
-          <a href="#">Settings</a>
-          <a href="#" onClick={handleLogout}>Logout</a>
+          <Link className="nav-item active" to="/settings">Settings</Link>
+          <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
         </div>
       </aside>
       <main className="main-content">
@@ -117,4 +108,3 @@ function DashboardAdmin() {
 }
 
 export default DashboardAdmin;
-

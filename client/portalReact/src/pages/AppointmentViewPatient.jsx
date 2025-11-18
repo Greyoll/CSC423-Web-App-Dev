@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { parseJwt, handleLogout } from '../hooks/useLogin';
+import { Link } from 'react-router-dom';
+import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 
-function AppointmentViewPatient({ onBack }) {
+function AppointmentViewPatient() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const handleLogout = useHandleLogout();
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -49,15 +51,15 @@ function AppointmentViewPatient({ onBack }) {
           <img src="/Images/Logo_White.png" alt="Valdez MD Logo White" />
         </div>
         <nav className="nav-menu">
-          <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>Dashboard</a>
-          <a className="nav-item active" href="#">Appointments</a>
+          <Link className="nav-item" to="/patient/dashboard">Dashboard</Link>
+          <Link className="nav-item active" to="/patient/appointments">Appointments</Link>
           <a className="nav-item" href="#">Schedule an appointment</a>
           <a className="nav-item" href="#">Contact a doctor</a>
           <a className="nav-item" href="#">Refill prescription</a>
         </nav>
         <div className="settings">
-          <a href="#">Settings</a>
-          <a href="#" onClick={handleLogout}>Logout</a>
+          <Link className="nav-item active" to="/settings">Settings</Link>
+          <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
         </div>
       </aside>
       <main className="main-content">

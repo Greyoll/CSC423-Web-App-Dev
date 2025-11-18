@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { parseJwt, handleLogout } from '../hooks/useLogin';
-import DashboardDoctor from './DashboardDoctor';
+import { Link } from 'react-router-dom';
+import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 
 function AppointmentViewDoctor() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState("appointments");
+  const handleLogout = useHandleLogout();
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -44,10 +44,6 @@ function AppointmentViewDoctor() {
     fetchAppointments();
   }, []);
 
-  if (currentPage === "dashboard") {
-    return <DashboardDoctor/>;
-  }
-
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -55,15 +51,15 @@ function AppointmentViewDoctor() {
           <img src="/Images/Logo_White.png" alt="Valdez MD Logo White" />
         </div>
         <nav className="nav-menu">
-          <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); setCurrentPage("dashboard"); }}>Dashboard</a>
+          <Link className="nav-item" to="/doctor/dashboard">Dashboard</Link>
           <a className="nav-item" href="#">Patient Records</a>
-          <a className="nav-item active" href="#">Appointments</a>
+          <Link className="nav-item active" to="/doctor/appointments">Appointments</Link>
           <a className="nav-item" href="#">Prescriptions</a>
           <a className="nav-item" href="#">Messages</a>
         </nav>
         <div className="settings">
-          <a href="#">Settings</a>
-          <a href="#" onClick={handleLogout}>Logout</a>
+          <Link className="nav-item active" to="/settings">Settings</Link>
+          <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
         </div>
       </aside>
 

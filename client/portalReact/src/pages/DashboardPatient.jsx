@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import AppointmentViewPatient from './AppointmentViewPatient';
-import { parseJwt, handleLogout } from '../hooks/useLogin';
+import { Link } from 'react-router-dom';
+import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 
 function DashboardPatient() {
-  const [currentPage, setCurrentPage] = useState("dashboard");
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const handleLogout = useHandleLogout();
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -36,10 +36,6 @@ function DashboardPatient() {
     fetchAppointments();
   }, []);
 
-  if (currentPage === "appointments") {
-    return <AppointmentViewPatient onBack={() => setCurrentPage("dashboard")} />;
-  }
-
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -47,15 +43,15 @@ function DashboardPatient() {
           <img src="/Images/Logo_White.png" alt="Valdez MD Logo White" />
         </div>
         <nav className="nav-menu">
-          <a className="nav-item active" href="#">Dashboard</a>
-          <a className="nav-item" href="#" onClick={(e) => { e.preventDefault(); setCurrentPage("appointments"); }}>Appointments</a>
+          <Link className="nav-item active" to="/patient/dashboard">Dashboard</Link>
+          <Link className="nav-item" to="/patient/appointments">Appointments</Link>
           <a className="nav-item" href="#">Schedule an appointment</a>
           <a className="nav-item" href="#">Contact a doctor</a>
           <a className="nav-item" href="#">Refill prescription</a>
         </nav>
         <div className="settings">
-          <a href="#">Settings</a>
-          <a href="#" onClick={handleLogout}>Logout</a>
+          <Link className="nav-item active" to="/settings">Settings</Link>
+          <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
         </div>
       </aside>
       <main className="main-content">
