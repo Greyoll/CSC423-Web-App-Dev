@@ -150,7 +150,7 @@ function Settings() {
                 </div>
                 <div className="info-item">
                   <label>Role:</label>
-                  <p className="role-badge">{userInfo.role}</p>
+                  <p>{userInfo.role}</p>
                 </div>
                 <div className="info-item">
                   <label>User ID:</label>
@@ -191,7 +191,6 @@ function Settings() {
               <h2>Account Actions</h2>
               <div className="settings-group">
                 <button className="settings-button secondary">Change Password</button>
-                <button className="settings-button secondary">Update Profile</button>
                 <button 
                   className="settings-button danger"
                   onClick={(e) => { e.preventDefault(); handleLogout(); }}

@@ -634,8 +634,8 @@ nav a {
 .role-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background-color: #000;
-  color: white;
+  background-color: #000 !important;
+  color: white !important;
   border-radius: 4px;
   font-size: 0.9rem;
   text-transform: capitalize;
