@@ -149,8 +149,8 @@ function AppointmentViewAdmin() {
         <div className="settings">
           <Link className="nav-item" to="/admin/users">User Management</Link>
           <a href="#">System Settings</a>
-          <Link to="/settings">Settings</Link>
-          <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
+          <Link className="nav-item active" to="/settings">Settings</Link>
+          <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
         </div>
       </aside>
 

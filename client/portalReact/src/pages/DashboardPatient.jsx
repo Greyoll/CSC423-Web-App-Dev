@@ -50,8 +50,8 @@ function DashboardPatient() {
           <a className="nav-item" href="#">Refill prescription</a>
         </nav>
         <div className="settings">
-          <Link to="/settings">Settings</Link>
-          <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
+          <Link className="nav-item active" to="/settings">Settings</Link>
+          <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
         </div>
       </aside>
       <main className="main-content">
