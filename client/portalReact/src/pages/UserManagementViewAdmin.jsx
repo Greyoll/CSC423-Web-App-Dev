@@ -99,8 +99,8 @@ function UserManagementViewAdmin(){
                 <div className="settings">
                     <Link className="nav-item active" to="/admin/users">User Management</Link>
                     <a href="#">System Settings</a>
-                    <a href="#">Settings</a>
-                    <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
+                    <Link className="nav-item active" to="/settings">Settings</Link>
+                    <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
                 </div>
             </aside>
             <main className="main-content">
