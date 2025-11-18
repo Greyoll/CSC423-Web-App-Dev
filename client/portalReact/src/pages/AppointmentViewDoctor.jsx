@@ -3,10 +3,22 @@ import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 
 function AppointmentViewDoctor() {
+  const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const handleLogout = useHandleLogout();
+
+  // Use effect to get users name for display
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const payload = parseJwt(token);
+    if (payload) {
+        const firstName = payload.firstName || "";
+        const lastName = payload.lastName || "";
+        setUserName(`${firstName} ${lastName}`.trim() || "User");
+    };
+  }, []);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -67,7 +79,7 @@ function AppointmentViewDoctor() {
         <header className="main-header">
           <h1>Doctor Appointments</h1>
           <div className="user-info">
-            <span>Dr Stanley Valdez</span>
+            <span>Dr. {userName}</span>
           </div>
         </header>
         {loading && <p style={{ padding: '20px' }}>Loading appointments...</p>}
