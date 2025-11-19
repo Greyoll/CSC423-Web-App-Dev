@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import Sidebar from '../components/Sidebar.jsx';
 
 function Settings() {
   const [userInfo, setUserInfo] = useState(null);
@@ -103,21 +104,7 @@ function Settings() {
 
   return (
     <div className="dashboard-container">
-      <aside className="sidebar">
-        <div className="logo">
-          <img src="/Images/Logo_White.png" alt="Valdez MD Logo White" />
-          {userRole === 'admin' && <h1 className="nav-item">Admin Page</h1>}
-        </div>
-        <nav className="nav-menu">
-          {getNavigationItems()}
-        </nav>
-        <div className="settings">
-          {userRole === 'admin' && <Link className="nav-item" to="/admin/users">User Management</Link>}
-          {userRole === 'admin' && <a href="#">System Settings</a>}
-          <Link className="nav-item active" to="/settings">Settings</Link>
-          <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
-        </div>
-      </aside>
+      <Sidebar role={userRole} />
 
       <main className="main-content">
         <header className="main-header">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -9,6 +10,7 @@ function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login, isLoggedIn, userRole } = useAuth();
+  const { darkMode } = useTheme();
 
   // Redirect if already logged in
   if (isLoggedIn && userRole) {
@@ -69,7 +71,10 @@ function Login() {
     <>
       <header>
         <div className="logo">
-          <img src="/Images/valdez_logo-black.jpg" alt="Valdez MD Logo Black" />
+          <img
+            src={darkMode ? "/Images/valdez_logo-white.png" : "/Images/valdez_logo-black.png"}
+            alt="Valdez MD Logo"
+          />
         </div>
         <nav>
           <ul>
