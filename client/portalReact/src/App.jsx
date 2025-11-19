@@ -12,6 +12,7 @@ import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import Sidebar from './components/Sidebar.jsx';
 
 function App() {
   return (
@@ -35,15 +36,19 @@ function AppRoutes() {
       <Route 
         path="/patient/dashboard" 
         element={
+          <div className="dashboard-container">
           <ProtectedRoute allowedRoles={['patient']}>
+            <Sidebar role="patient" />
             <DashboardPatient />
           </ProtectedRoute>
+          </div>
         } 
       />
       <Route 
         path="/patient/appointments" 
         element={
           <ProtectedRoute allowedRoles={['patient']}>
+            <Sidebar role="patient" />
             <AppointmentViewPatient />
           </ProtectedRoute>
         } 
@@ -54,6 +59,7 @@ function AppRoutes() {
         path="/doctor/dashboard" 
         element={
           <ProtectedRoute allowedRoles={['doctor']}>
+            <Sidebar role="doctor" />
             <DashboardDoctor />
           </ProtectedRoute>
         } 
@@ -62,6 +68,7 @@ function AppRoutes() {
         path="/doctor/appointments" 
         element={
           <ProtectedRoute allowedRoles={['doctor']}>
+            <Sidebar role="doctor" />
             <AppointmentViewDoctor />
           </ProtectedRoute>
         } 
@@ -72,6 +79,7 @@ function AppRoutes() {
         path="/admin/dashboard" 
         element={
           <ProtectedRoute allowedRoles={['admin']}>
+            <Sidebar role="admin" />
             <DashboardAdmin />
           </ProtectedRoute>
         } 
@@ -80,6 +88,7 @@ function AppRoutes() {
         path="/admin/appointments" 
         element={
           <ProtectedRoute allowedRoles={['admin']}>
+            <Sidebar role="admin" />
             <AppointmentViewAdmin />
           </ProtectedRoute>
         } 
@@ -88,6 +97,7 @@ function AppRoutes() {
         path="/admin/users" 
         element={
           <ProtectedRoute allowedRoles={['admin']}>
+            <Sidebar role="admin" />
             <UserManagementViewAdmin />
           </ProtectedRoute>
         } 

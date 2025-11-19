@@ -44,22 +44,6 @@ function DashboardPatient() {
 
   return (
     <div className="dashboard-container">
-      <aside className="sidebar">
-        <div className="logo">
-          <img src="/Images/Logo_White.png" alt="Valdez MD Logo White" />
-        </div>
-        <nav className="nav-menu">
-          <Link className="nav-item active" to="/patient/dashboard">Dashboard</Link>
-          <Link className="nav-item" to="/patient/appointments">Appointments</Link>
-          <a className="nav-item" href="#">Schedule an appointment</a>
-          <a className="nav-item" href="#">Contact a doctor</a>
-          <a className="nav-item" href="#">Refill prescription</a>
-        </nav>
-        <div className="settings">
-          <Link className="nav-item active" to="/settings">Settings</Link>
-          <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
-        </div>
-      </aside>
       <main className="main-content">
         <header className="main-header">
           <h1>Dashboard</h1>

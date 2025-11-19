@@ -320,7 +320,9 @@ nav a {
    SIDEBAR
    ================================= */
 .sidebar {
+  position: fixed;
   background-color: #000000;
+  height: 100vh;
   width: 240px;
   padding: 2rem 1rem;
   display: flex;
@@ -344,7 +346,7 @@ nav a {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  gap: 1rem;
 }
 
 .nav-item {
@@ -357,7 +359,7 @@ nav a {
   color: #ffffff;
   font-size: 0.85rem;
   display: block;
-  margin-top: 1rem;
+  margin-top: auto;
 }
 
 /* =================================
@@ -366,6 +368,7 @@ nav a {
 .main-content {
   flex: 1;
   padding: 2rem;
+  margin-left: 280px;
 }
 
 .main-header {

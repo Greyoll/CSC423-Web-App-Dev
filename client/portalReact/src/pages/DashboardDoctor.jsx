@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
+import Sidebar from '../components/Sidebar.jsx';
 
 function DashboardDoctor() {
   const [userName, setUserName] = useState("");
@@ -44,22 +45,8 @@ function DashboardDoctor() {
 
   return (
     <div className="dashboard-container">
-      <aside className="sidebar">
-        <div className="logo">
-          <img src="/Images/Logo_White.png" alt="Valdez MD Logo White" />
-        </div>
-        <nav className="nav-menu">
-          <Link className="nav-item active" to="/doctor/dashboard">Dashboard</Link>
-          <a className="nav-item" href="#">Patient Records</a>
-          <Link className="nav-item" to="/doctor/appointments">Appointments</Link>
-          <a className="nav-item" href="#">Prescriptions</a>
-          <a className="nav-item" href="#">Messages</a>
-        </nav>
-        <div className="settings">
-          <Link className="nav-item active" to="/settings">Settings</Link>
-          <a href="#" className="nav-item active" onClick={(e) => { e.preventDefault(); handleLogout(); }}>Logout</a>
-        </div>
-      </aside>
+      <Sidebar role="doctor" />
+
       <main className="main-content">
         <header className="main-header">
           <h1>Doctor Dashboard</h1>
