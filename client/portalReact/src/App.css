@@ -5,6 +5,10 @@
   font-family: Arial, sans-serif;
 }
 
+:root {
+  color-scheme: light;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -320,7 +324,9 @@ nav a {
    SIDEBAR
    ================================= */
 .sidebar {
+  position: fixed;
   background-color: #000000;
+  height: 100vh;
   width: 240px;
   padding: 2rem 1rem;
   display: flex;
@@ -344,7 +350,7 @@ nav a {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  gap: 1rem;
 }
 
 .nav-item {
@@ -357,7 +363,7 @@ nav a {
   color: #ffffff;
   font-size: 0.85rem;
   display: block;
-  margin-top: 1rem;
+  margin-top: auto;
 }
 
 /* =================================
@@ -366,6 +372,7 @@ nav a {
 .main-content {
   flex: 1;
   padding: 2rem;
+  margin-left: 280px;
 }
 
 .main-header {
@@ -387,15 +394,25 @@ nav a {
 .appointments-section {
   margin-bottom: 2rem;
   background-color: #F0F0F0;
+  color:#000;
   padding: 1.5rem;
   width: 90%;
   border-radius: 12px;
 }
 
-.appointment-cards {
+/* .appointment-cards {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+} */
+
+.appointment-cards {
+  flex: 1;           /* makes all cards grow equally */
+  min-width: 250px;  /* adjusts how wide each card can be */
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  gap: 1rem;
 }
 
 .card {
@@ -766,8 +783,12 @@ body.dark-mode {
 }
 
 .dark-mode .login-btn {
-  background-color: #e0e0e0;
+  background-color: #444444;
   color: #000000;
+}
+
+.dark-mode .login-btn:hover {
+  background-color: #555555;
 }
 
 .dark-mode .main-container {

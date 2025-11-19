@@ -12,6 +12,7 @@ import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import Sidebar from './components/Sidebar.jsx';
 
 function App() {
   return (
@@ -35,9 +36,11 @@ function AppRoutes() {
       <Route 
         path="/patient/dashboard" 
         element={
+          <div className="dashboard-container">
           <ProtectedRoute allowedRoles={['patient']}>
             <DashboardPatient />
           </ProtectedRoute>
+          </div>
         } 
       />
       <Route 
