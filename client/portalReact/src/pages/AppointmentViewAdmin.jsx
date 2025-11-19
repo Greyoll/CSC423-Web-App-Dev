@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
 import Sidebar from '../components/Sidebar.jsx';
+import { useTheme } from '../context/ThemeContext';
 
 function AppointmentViewAdmin() {
   const [userName, setUserName] = useState("");
@@ -18,6 +19,7 @@ function AppointmentViewAdmin() {
   });
   const [isCreating, setIsCreating] = useState(false);
   const handleLogout = useHandleLogout();
+  const { darkMode } = useTheme();
 
   useEffect(() => {
     fetchAppointments();
@@ -159,7 +161,11 @@ function AppointmentViewAdmin() {
 
         <button 
           onClick={() => setShowAddForm(!showAddForm)}
-          style={{ marginBottom: '20px', padding: '10px 20px', cursor: 'pointer' }}
+          style={{ 
+            marginBottom: '20px', padding: '10px 20px', cursor: 'pointer',
+            backgroundColor: darkMode ? '#fff' : '#f9f9f9',
+            color: '#000',
+           }}
         >
           {showAddForm ? "Cancel" : "Add New Appointment"}
         </button>
