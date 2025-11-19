@@ -4,33 +4,57 @@ const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
   const [darkMode, setDarkMode] = useState(() => {
-    // Check localStorage for saved preference
     const saved = localStorage.getItem('darkMode');
-    return saved === 'true';
+
+    // If the user has selected a theme manually, use it
+    if (saved !== null) {
+      return saved === 'true';
+    }
+
+    // Otherwise, follow system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
+  // Apply or remove dark-mode class on the body
   useEffect(() => {
-    // Apply theme class to body
     if (darkMode) {
       document.body.classList.add('dark-mode');
     } else {
       document.body.classList.remove('dark-mode');
     }
-    
-    // Save preference to localStorage
-    localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
 
+  // Listen for system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const handleChange = (e) => {
+      // Only update automatically if user hasn't manually overridden
+      const locked = localStorage.getItem('themeLocked');
+      if (!locked) {
+        setDarkMode(e.matches);
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // When user manually toggles
   const toggleDarkMode = () => {
-    setDarkMode(prev => !prev);
+    const newValue = !darkMode;
+    setDarkMode(newValue);
+
+    // Save the manual choice
+    localStorage.setItem('darkMode', newValue);
+    localStorage.setItem('themeLocked', 'true');
   };
 
-  const value = {
-    darkMode,
-    toggleDarkMode,
-  };
-
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {
