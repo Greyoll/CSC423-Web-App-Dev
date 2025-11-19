@@ -38,7 +38,6 @@ function AppRoutes() {
         element={
           <div className="dashboard-container">
           <ProtectedRoute allowedRoles={['patient']}>
-            <Sidebar role="patient" />
             <DashboardPatient />
           </ProtectedRoute>
           </div>
@@ -48,7 +47,6 @@ function AppRoutes() {
         path="/patient/appointments" 
         element={
           <ProtectedRoute allowedRoles={['patient']}>
-            <Sidebar role="patient" />
             <AppointmentViewPatient />
           </ProtectedRoute>
         } 
@@ -59,7 +57,6 @@ function AppRoutes() {
         path="/doctor/dashboard" 
         element={
           <ProtectedRoute allowedRoles={['doctor']}>
-            <Sidebar role="doctor" />
             <DashboardDoctor />
           </ProtectedRoute>
         } 
@@ -68,7 +65,6 @@ function AppRoutes() {
         path="/doctor/appointments" 
         element={
           <ProtectedRoute allowedRoles={['doctor']}>
-            <Sidebar role="doctor" />
             <AppointmentViewDoctor />
           </ProtectedRoute>
         } 
@@ -79,7 +75,6 @@ function AppRoutes() {
         path="/admin/dashboard" 
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Sidebar role="admin" />
             <DashboardAdmin />
           </ProtectedRoute>
         } 
@@ -88,7 +83,6 @@ function AppRoutes() {
         path="/admin/appointments" 
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Sidebar role="admin" />
             <AppointmentViewAdmin />
           </ProtectedRoute>
         } 
@@ -97,7 +91,6 @@ function AppRoutes() {
         path="/admin/users" 
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <Sidebar role="admin" />
             <UserManagementViewAdmin />
           </ProtectedRoute>
         } 

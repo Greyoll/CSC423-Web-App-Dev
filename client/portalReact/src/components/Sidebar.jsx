@@ -9,7 +9,7 @@ function Sidebar({ role }) {
       
       {/* Logo */}
       <div className="logo">
-        <img src="/Images/Logo_White.png" alt="Valdez MD Logo White" />
+        <img src="/Images/valdez_logo-white.png" alt="Valdez MD Logo White" />
       </div>
 
       {/* Role-specific navigation */}

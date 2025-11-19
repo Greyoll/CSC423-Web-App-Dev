@@ -5,6 +5,10 @@
   font-family: Arial, sans-serif;
 }
 
+:root {
+  color-scheme: light;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -390,15 +394,25 @@ nav a {
 .appointments-section {
   margin-bottom: 2rem;
   background-color: #F0F0F0;
+  color:#000;
   padding: 1.5rem;
   width: 90%;
   border-radius: 12px;
 }
 
-.appointment-cards {
+/* .appointment-cards {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+} */
+
+.appointment-cards {
+  flex: 1;           /* makes all cards grow equally */
+  min-width: 250px;  /* adjusts how wide each card can be */
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  gap: 1rem;
 }
 
 .card {
@@ -769,8 +783,12 @@ body.dark-mode {
 }
 
 .dark-mode .login-btn {
-  background-color: #e0e0e0;
+  background-color: #444444;
   color: #000000;
+}
+
+.dark-mode .login-btn:hover {
+  background-color: #555555;
 }
 
 .dark-mode .main-container {

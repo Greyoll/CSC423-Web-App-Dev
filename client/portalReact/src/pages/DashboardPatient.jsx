@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
+import Sidebar from '../components/Sidebar';
 
 function DashboardPatient() {
   const [userName, setUserName] = useState("");
@@ -44,6 +45,8 @@ function DashboardPatient() {
 
   return (
     <div className="dashboard-container">
+      <Sidebar role="patient" />
+
       <main className="main-content">
         <header className="main-header">
           <h1>Dashboard</h1>
