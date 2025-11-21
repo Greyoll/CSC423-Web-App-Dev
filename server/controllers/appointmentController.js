@@ -1,6 +1,15 @@
 const Appointment = require("../models/appointmentModel");
 const User = require("../models/userModel");
 
+// Helper function to compare dates (ignoring time)
+function isSameDate(date1, date2) {
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+    d1.setHours(0, 0, 0, 0);
+    d2.setHours(0, 0, 0, 0);
+    return d1.getTime() === d2.getTime();
+}
+
 // Create appointment WITHOUT double booking 
 module.exports.createAppointment = async (req, res) => {
     try {
@@ -28,12 +37,16 @@ module.exports.createAppointment = async (req, res) => {
         if (appointmentStart >= appointmentEnd) {
             return res.status(400).json({ error: "Start time must be before end time" });
         }
+        
         // Check for double booking
-        const existingApt = await Appointment.find({
-            date: appointmentDate
-        });
+        const existingApts = await Appointment.find({});
 
-        for (const existing of existingApt) {
+        for (const existing of existingApts) {
+            // Only check appointments on the same date
+            if (!isSameDate(existing.date, appointmentDate)) {
+                continue;
+            }
+
             const existingDate = new Date(existing.date);
             existingDate.setHours(0, 0, 0, 0);
 
@@ -148,11 +161,16 @@ module.exports.updateAppointment = async (req, res) => {
         const updatedDate = date || currentApt.date;
         const updatedStartTime = startTime || currentApt.startTime;
         const updatedEndTime = endTime || currentApt.endTime;
-        const updatedPatientId = patientId || currentApt.patientId;
-        const updatedDoctorId = doctorId || currentApt.doctorId;
+        const updatedPatientId = patientId !== undefined ? patientId : currentApt.patientId;
+        const updatedDoctorId = doctorId !== undefined ? doctorId : currentApt.doctorId;
 
-        // Only check for double booking if the date or time or users are being changed
-        if (updatedDate !== currentApt.date || updatedStartTime !== currentApt.startTime || updatedEndTime !== currentApt.endTime || updatedPatientId !== currentApt.patientId || updatedDoctorId !== currentApt.doctorId) {
+        // Check if anything actually changed
+        const dateChanged = !isSameDate(updatedDate, currentApt.date);
+        const timeChanged = updatedStartTime !== currentApt.startTime || updatedEndTime !== currentApt.endTime;
+        const usersChanged = updatedPatientId !== currentApt.patientId || updatedDoctorId !== currentApt.doctorId;
+
+        // Only check for double booking if something relevant changed
+        if (dateChanged || timeChanged || usersChanged) {
             const appointmentDate = new Date(updatedDate);
             appointmentDate.setHours(0, 0, 0, 0);
 
@@ -169,13 +187,19 @@ module.exports.updateAppointment = async (req, res) => {
                 return res.status(400).json({ error: "Start time must be before end time" });
             }
 
-            const existingApt = await Appointment.find({
-                date: appointmentDate,
-                // Exclude the appointment being updated
-                id: { $ne: appointmentId }
-            });
+            const existingApts = await Appointment.find({});
 
-            for (const existing of existingApt) {
+            for (const existing of existingApts) {
+                // Exclude the appointment being updated
+                if (existing.id === appointmentId) {
+                    continue;
+                }
+
+                // Only check appointments on the same date
+                if (!isSameDate(existing.date, appointmentDate)) {
+                    continue;
+                }
+
                 const existingDate = new Date(existing.date);
                 existingDate.setHours(0, 0, 0, 0);
 
