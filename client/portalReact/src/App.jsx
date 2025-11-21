@@ -12,6 +12,8 @@ import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { NotificationProvider } from './context/NotificationContext';
+import NotificationDisplay from './components/NotificationDisplay';
 import Sidebar from './components/Sidebar.jsx';
 
 function App() {
@@ -19,7 +21,10 @@ function App() {
     <Router>
       <ThemeProvider>
         <AuthProvider>
-          <AppRoutes />
+          <NotificationProvider>
+            <NotificationDisplay />
+            <AppRoutes />
+          </NotificationProvider>
         </AuthProvider>
       </ThemeProvider>
     </Router>

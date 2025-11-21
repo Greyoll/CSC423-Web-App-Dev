@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useNotification } from '../context/NotificationContext';
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -11,6 +12,7 @@ function Login() {
   const navigate = useNavigate();
   const { login, isLoggedIn, userRole } = useAuth();
   const { darkMode } = useTheme();
+  const { addNotification } = useNotification(); 
 
   // Redirect if already logged in
   if (isLoggedIn && userRole) {
@@ -23,6 +25,7 @@ function Login() {
     setError("");
     if (!username || !password) {
       setError("Please enter both a username and a password");
+      addNotification("Please enter both a username and a password", 'warning');
       return;
     }
 
@@ -46,11 +49,13 @@ function Login() {
       } catch (jsonErr) {
         const text = await response.text();
         console.log("Response text (not JSON):", text);
+        addNotification("Invalid server response, expected JSON", 'error');
         throw new Error("Invalid server response, expected JSON");
       }
 
       if (!response.ok) {
         setError(data.error || data.message || "Login failed");
+        addNotification(data.error || data.message || "Login failed", 'error');
         return;
       }
 

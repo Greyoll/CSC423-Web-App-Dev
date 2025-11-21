@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
+import { useNotification } from '../context/NotificationContext'; 
 import Sidebar from '../components/Sidebar.jsx';
 
 function UserManagementViewAdmin() {
@@ -14,6 +15,7 @@ function UserManagementViewAdmin() {
         role: "patient",
         password: "",
     });
+    const { addNotification } = useNotification();
     const handleLogout = useHandleLogout();
 
     useEffect(() => {
@@ -40,7 +42,7 @@ function UserManagementViewAdmin() {
             const data = await res.json();
             setUsers(data);
         } catch (err) {
-            alert("Couldn't fetch users");
+            addNotification("Couldn't fetch users", 'error');
         }
     };
 
@@ -66,7 +68,7 @@ function UserManagementViewAdmin() {
 
             if (!res.ok) {
                 const errText = await res.text();
-                alert("Error saving user: " + errText);
+                addNotification("Error saving user: " + errText, 'error');
                 return;
             }
 
@@ -79,19 +81,29 @@ function UserManagementViewAdmin() {
             });
             setEditingUser(null);
             fetchUsers();
-            alert(editingUser ? "User updated successfully!" : "User added successfully!");
+            addNotification(editingUser ? "User updated successfully!" : "User added successfully!", 'success');
         } catch (err) {
             console.error(err);
-            alert("Error saving user. Check console for details.");
+            addNotification("Error saving user. Check console for details.", 'error');
         }
     };
 
     const handleDelete = async (id) => {
         const token = localStorage.getItem("token");
-        await fetch(`http://localhost:3000/api/users/${id}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        try {
+            await fetch(`http://localhost:3000/api/users/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.ok) {
+                addNotification("User deleted successfully!", 'success');
+            }
+            else {
+                addNotification("Failed to delete user", 'error');
+            }
+        } catch (err) {
+            addNotification("Error deleting user: " + err.message, 'error');
+        }
         fetchUsers();
     };
 

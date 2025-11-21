@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { parseJwt } from '../hooks/useLogin';
 import Sidebar from '../components/Sidebar.jsx';
 import { useTheme } from '../context/ThemeContext';
+import { useNotification } from '../context/NotificationContext';
 
 function AppointmentViewAdmin() {
+  const { addNotification } = useNotification(); 
   const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [users, setUsers] = useState([]);
@@ -103,7 +105,7 @@ function AppointmentViewAdmin() {
 
   const handleAddAppointment = async () => {
     if (!formData.date || !formData.startTime || !formData.endTime || !formData.patientId || !formData.doctorId) {
-      alert("Please fill in all fields");
+      addNotification("Please fill in all fields", 'warning');
       return;
     }
 
@@ -130,11 +132,10 @@ function AppointmentViewAdmin() {
 
       if (!res.ok) {
         const errData = await res.json();
-        alert("Failed to create appointment: " + (errData.error || "Unknown error"));
-        return;
+        addNotification("Failed to create appointment: " + (errData.error || "Unknown error"), 'error');
       }
 
-      alert("Appointment created successfully!");
+       addNotification("Appointment created successfully!", 'success');
       
       setFormData({
         date: "",
@@ -147,7 +148,7 @@ function AppointmentViewAdmin() {
       fetchAppointments();
     } catch (err) {
       console.error(err);
-      alert("Error creating appointment: " + err.message);
+      addNotification("Error creating appointment: " + err.message, 'error');
     } finally {
       setIsCreating(false);
     }
@@ -167,15 +168,15 @@ function AppointmentViewAdmin() {
 
       if (!res.ok) {
         const errText = await res.text();
-        alert("Failed to delete appointment: " + errText);
+        addNotification("Failed to delete appointment: " + errText, 'error');
         return;
       }
 
-      alert("Appointment deleted successfully!");
+      addNotification("Appointment deleted successfully!", 'success');
       fetchAppointments();
     } catch (err) {
       console.error(err);
-      alert("Error deleting appointment: " + err.message);
+      addNotification("Error deleting appointment: " + err.message, 'error');
     }
   };
 
@@ -205,7 +206,7 @@ function AppointmentViewAdmin() {
     if (!editingAppointment) return;
 
     if (!editFormData.date || !editFormData.startTime || !editFormData.endTime || !editFormData.patientId || !editFormData.doctorId) {
-      alert("Please fill in all fields");
+      addNotification("Please fill in all fields", 'warning');
       return;
     }
 
@@ -232,16 +233,15 @@ function AppointmentViewAdmin() {
 
       if (!res.ok) {
         const errData = await res.json();
-        alert("Failed to update appointment: " + (errData.error || "Unknown error"));
-        return;
+        addNotification("Failed to update appointment: " + (errData.error || "Unknown error"), 'error');
       }
 
       await fetchAppointments();
       closeEdit();
-      alert("Appointment updated successfully!");
+      addNotification("Appointment updated successfully!", 'success');
     } catch (err) {
       console.error(err);
-      alert("Error updating appointment: " + err.message);
+      addNotification("Error updating appointment: " + err.message, 'error');
     }
   };
 

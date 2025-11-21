@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { parseJwt } from '../hooks/useLogin';
+import { useNotification } from '../context/NotificationContext';
 import Sidebar from '../components/Sidebar.jsx';
 
 function AppointmentViewDoctor() {
@@ -7,6 +8,7 @@ function AppointmentViewDoctor() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -70,15 +72,15 @@ function AppointmentViewDoctor() {
 
       if (!res.ok) {
         const errText = await res.text();
-        alert("Failed to delete appointment: " + errText);
+        addNotification("Failed to delete appointment: " + errText, 'error');
         return;
       }
 
-      alert("Appointment deleted successfully!");
+      addNotification("Appointment deleted successfully!", 'success');
       fetchAppointments();
     } catch (err) {
       console.error(err);
-      alert("Error deleting appointment: " + err.message);
+      addNotification("Error deleting appointment: " + err.message, 'error');
     }
   };
 
