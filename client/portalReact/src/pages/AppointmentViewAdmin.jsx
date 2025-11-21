@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { parseJwt, useHandleLogout } from '../hooks/useLogin';
+import { parseJwt } from '../hooks/useLogin';
 import Sidebar from '../components/Sidebar.jsx';
 import { useTheme } from '../context/ThemeContext';
 
@@ -15,25 +14,32 @@ function AppointmentViewAdmin() {
     startTime: "",
     endTime: "",
     patientId: "",
-    doctorId: "",
+    doctorId: ""
   });
   const [isCreating, setIsCreating] = useState(false);
-  const handleLogout = useHandleLogout();
+  const [editingAppointment, setEditingAppointment] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    date: "",
+    startTime: "",
+    endTime: "",
+    patientId: "",
+    doctorId: ""
+  });
   const { darkMode } = useTheme();
 
   useEffect(() => {
     fetchAppointments();
   }, []);
 
-  // Use effect to get users name for display
+  // Use effect to get user's name for display
   useEffect(() => {
     const token = localStorage.getItem("token");
     const payload = parseJwt(token);
     if (payload) {
-        const firstName = payload.firstName || "";
-        const lastName = payload.lastName || "";
-        setUserName(`${firstName} ${lastName}`.trim() || "User");
-    };
+      const firstName = payload.firstName || "";
+      const lastName = payload.lastName || "";
+      setUserName(`${firstName} ${lastName}`.trim() || "User");
+    }
   }, []);
 
   const fetchAppointments = async () => {
@@ -147,6 +153,75 @@ function AppointmentViewAdmin() {
     }
   };
 
+  // Open edit modal and prefill fields
+  const openEdit = (apt) => {
+    setEditingAppointment(apt);
+    setEditFormData({
+      date: apt.date ? new Date(apt.date).toISOString().slice(0, 10) : "",
+      startTime: apt.startTime || "",
+      endTime: apt.endTime || "",
+      patientId: apt.patientId != null ? String(apt.patientId) : "",
+      doctorId: apt.doctorId != null ? String(apt.doctorId) : "",
+    });
+  };
+
+  const closeEdit = () => {
+    setEditingAppointment(null);
+    setEditFormData({
+      date: "",
+      startTime: "",
+      endTime: "",
+      patientId: "",
+      doctorId: "",
+    });
+  };
+
+  // Save edited appointment
+  const saveEdit = async () => {
+    if (!editingAppointment) return;
+
+    if (!editFormData.date || !editFormData.startTime || !editFormData.endTime || !editFormData.patientId || !editFormData.doctorId) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const appointmentIdParam = editingAppointment.id || editingAppointment._id;
+
+      const payload = {
+        date: editFormData.date,
+        startTime: editFormData.startTime,
+        endTime: editFormData.endTime,
+        patientId: Number(editFormData.patientId),
+        doctorId: Number(editFormData.doctorId),
+      };
+
+      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentIdParam}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        alert("Failed to update appointment: " + errText);
+        return;
+      }
+
+      // refresh list after successful update
+      await fetchAppointments();
+      closeEdit();
+      alert("Appointment updated successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Error updating appointment: " + err.message);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <Sidebar role="admin" />
@@ -222,6 +297,58 @@ function AppointmentViewAdmin() {
           </div>
         )}
 
+        {/* Edit modal */}
+        {editingAppointment && (
+          <div className="popup-overlay">
+            <div className="popup">
+              <button className="close-btn" onClick={closeEdit}>X</button>
+              <h2>Edit Appointment #{editingAppointment.id || editingAppointment._id}</h2>
+
+              <div className="form-section">
+                <label>Date:</label>
+                <input
+                  type="date"
+                  value={editFormData.date}
+                  onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
+                />
+
+                <label>Start Time:</label>
+                <input
+                  type="time"
+                  value={editFormData.startTime}
+                  onChange={(e) => setEditFormData({ ...editFormData, startTime: e.target.value })}
+                />
+
+                <label>End Time:</label>
+                <input
+                  type="time"
+                  value={editFormData.endTime}
+                  onChange={(e) => setEditFormData({ ...editFormData, endTime: e.target.value })}
+                />
+
+                <label>Patient ID:</label>
+                <input
+                  type="number"
+                  value={editFormData.patientId}
+                  onChange={(e) => setEditFormData({ ...editFormData, patientId: e.target.value })}
+                />
+
+                <label>Doctor ID:</label>
+                <input
+                  type="number"
+                  value={editFormData.doctorId}
+                  onChange={(e) => setEditFormData({ ...editFormData, doctorId: e.target.value })}
+                />
+
+                <div style={{ marginTop: 12 }}>
+                  <button onClick={saveEdit} style={{ marginRight: 8 }}>Save</button>
+                  <button onClick={closeEdit}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {loading && <p style={{ padding: '20px' }}>Loading appointments...</p>}
 
         {error && <p style={{ padding: '20px', color: 'red' }}>Error: {error}</p>}
@@ -237,17 +364,24 @@ function AppointmentViewAdmin() {
               {appointments.map((apt) => (
                 <div className="card" key={apt._id || apt.id}>
                   <h1>Appointment #{apt.id}</h1>
-                  <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString() : '—'}</h2>
                   <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
                   <p><strong>Patient ID:</strong> {apt.patientId}</p>
                   <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
-                  <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString()}</p>
-                  <button 
-                    onClick={() => handleDeleteAppointment(apt.id)}
-                    style={{ marginTop: '10px', backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
-                  >
-                    Delete
-                  </button>
+                  <p><strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString() : '—'}</p>
+
+                  <div style={{ marginTop: 10 }}>
+                    <button onClick={() => openEdit(apt)}
+                      style={{ backgroundColor: '#aac0b9ff', color: 'white', padding: '5px 10px', cursor: 'pointer', marginRight: '10px' }}
+                    >
+                      Edit</button>
+                    <button 
+                      onClick={() => handleDeleteAppointment(apt.id || apt._id)}
+                      style={{ backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { parseJwt, useHandleLogout } from '../hooks/useLogin';
+import { parseJwt } from '../hooks/useLogin';
 import Sidebar from '../components/Sidebar.jsx';
 
 function AppointmentViewDoctor() {
@@ -8,7 +7,6 @@ function AppointmentViewDoctor() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const handleLogout = useHandleLogout();
 
   // Use effect to get users name for display
   useEffect(() => {
@@ -22,7 +20,10 @@ function AppointmentViewDoctor() {
   }, []);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
       try {
         const token = localStorage.getItem("token");
         const payload = parseJwt(token);
@@ -53,9 +54,33 @@ function AppointmentViewDoctor() {
       } finally {
         setLoading(false);
       }
-    };
-    fetchAppointments();
-  }, []);
+  };
+
+  const handleCancelAppointment = async (appointmentId) => {
+    if (!window.confirm("Are you sure you want to delete this appointment?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        alert("Failed to delete appointment: " + errText);
+        return;
+      }
+
+      alert("Appointment deleted successfully!");
+      fetchAppointments();
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting appointment: " + err.message);
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -85,6 +110,14 @@ function AppointmentViewDoctor() {
                   <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
                   <p><strong>Patient ID:</strong> {apt.patientId}</p>
                   <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString()}</p>
+                  <div style={{ marginTop: 10 }}>
+                    <button 
+                      onClick={() => handleCancelAppointment(apt.id || apt._id)}
+                      style={{ backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
+                    >
+                      Cancel Appointment
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
