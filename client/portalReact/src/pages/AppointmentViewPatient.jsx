@@ -8,7 +8,6 @@ function AppointmentViewPatient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-    // Use effect to get users name for display
   useEffect(() => {
     const token = localStorage.getItem("token");
     const payload = parseJwt(token);
@@ -46,6 +45,7 @@ function AppointmentViewPatient() {
         }
 
         const data = await res.json();
+        console.log("Fetched appointments:", data);
         setAppointments(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
@@ -108,11 +108,9 @@ function AppointmentViewPatient() {
             <div className="appointment-cards">
               {appointments.map((apt) => (
                 <div className="card" key={apt._id || apt.id}>
-                  <h1>Appointment #{apt.id}</h1>
+                  <h1>Appointment with Dr. {apt.doctorName}</h1>
                   <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
                   <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
-                  <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
-                  <p><strong>Patient ID:</strong> {apt.patientId}</p>
                   <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString()}</p>
                   <div style={{ marginTop: 10 }}>
                     <button 
