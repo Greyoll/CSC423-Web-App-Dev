@@ -1,6 +1,6 @@
 # Valdez Medical Portal
 
-A comprehensive medical portal web application built with React and Node.js that enables patients, doctors, and administrators to manage appointments, user accounts, and medical records.
+A comprehensive medical portal web application built with React and Node.js that enables patients, doctors, and admins to manage appointments and user accounts.
 
 ## Features
 
