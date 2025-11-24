@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { parseJwt } from '../hooks/useLogin';
+import { useNotification } from '../context/NotificationContext';
+import ConfirmationModal from '../components/ConfirmationModal'; 
 import Sidebar from '../components/Sidebar.jsx';
 import { useTheme } from '../context/ThemeContext';
 
@@ -26,7 +28,10 @@ function AppointmentViewAdmin() {
     patientId: "",
     doctorId: ""
   });
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); 
+  const [appointmentToDelete, setAppointmentToDelete] = useState(null); 
   const { darkMode } = useTheme();
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     fetchUsers();
@@ -103,7 +108,7 @@ function AppointmentViewAdmin() {
 
   const handleAddAppointment = async () => {
     if (!formData.date || !formData.startTime || !formData.endTime || !formData.patientId || !formData.doctorId) {
-      alert("Please fill in all fields");
+      addNotification("Please fill in all fields", 'warning');
       return;
     }
 
@@ -130,11 +135,11 @@ function AppointmentViewAdmin() {
 
       if (!res.ok) {
         const errData = await res.json();
-        alert("Failed to create appointment: " + (errData.error || "Unknown error"));
+        addNotification("Failed to create appointment: " + (errData.error || "Unknown error"), 'error');
         return;
       }
 
-      alert("Appointment created successfully!");
+      addNotification("Appointment created successfully!", 'success');
       
       setFormData({
         date: "",
@@ -147,36 +152,50 @@ function AppointmentViewAdmin() {
       fetchAppointments();
     } catch (err) {
       console.error(err);
-      alert("Error creating appointment: " + err.message);
+      addNotification("Error creating appointment: " + err.message, 'error');
     } finally {
       setIsCreating(false);
     }
   };
 
-  const handleDeleteAppointment = async (appointmentId) => {
-    if (!window.confirm("Are you sure you want to delete this appointment?")) {
-      return;
-    }
+  // Open delete confirmation modal
+  const openDeleteConfirmation = (appointment) => {
+    setAppointmentToDelete(appointment);
+    setShowDeleteConfirmation(true);
+  };
+
+  // Handle confirmed deletion
+  const handleConfirmDelete = async () => {
+    if (!appointmentToDelete) return;
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentId}`, {
+      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentToDelete.id || appointmentToDelete._id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) {
         const errText = await res.text();
-        alert("Failed to delete appointment: " + errText);
+        addNotification("Failed to delete appointment: " + errText, 'error');
         return;
       }
 
-      alert("Appointment deleted successfully!");
+      addNotification("Appointment deleted successfully!", 'success');
       fetchAppointments();
     } catch (err) {
       console.error(err);
-      alert("Error deleting appointment: " + err.message);
+      addNotification("Error deleting appointment: " + err.message, 'error');
     }
+
+    setShowDeleteConfirmation(false);
+    setAppointmentToDelete(null);
+  };
+
+  // Handle cancel deletion
+  const handleCancelDelete = () => {
+    setShowDeleteConfirmation(false);
+    setAppointmentToDelete(null);
   };
 
   const openEdit = (apt) => {
@@ -205,7 +224,7 @@ function AppointmentViewAdmin() {
     if (!editingAppointment) return;
 
     if (!editFormData.date || !editFormData.startTime || !editFormData.endTime || !editFormData.patientId || !editFormData.doctorId) {
-      alert("Please fill in all fields");
+      addNotification("Please fill in all fields", 'warning');
       return;
     }
 
@@ -232,16 +251,16 @@ function AppointmentViewAdmin() {
 
       if (!res.ok) {
         const errData = await res.json();
-        alert("Failed to update appointment: " + (errData.error || "Unknown error"));
+        addNotification("Failed to update appointment: " + (errData.error || "Unknown error"), 'error');
         return;
       }
 
       await fetchAppointments();
       closeEdit();
-      alert("Appointment updated successfully!");
+      addNotification("Appointment updated successfully!", 'success');
     } catch (err) {
       console.error(err);
-      alert("Error updating appointment: " + err.message);
+      addNotification("Error updating appointment: " + err.message, 'error');
     }
   };
 
@@ -251,6 +270,18 @@ function AppointmentViewAdmin() {
   return (
     <div className="dashboard-container">
       <Sidebar role="admin" />
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirmation}
+        title="Delete Appointment?"
+        message={`Are you sure you want to delete the appointment between ${appointmentToDelete?.patientName} and Dr. ${appointmentToDelete?.doctorName} on ${appointmentToDelete?.date ? new Date(appointmentToDelete.date).toLocaleDateString() : ''}?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        confirmText="Delete Appointment"
+        cancelText="Cancel"
+        isDangerous={true}
+      />
 
       <main className="main-content">
         <header className="main-header">
@@ -410,7 +441,8 @@ function AppointmentViewAdmin() {
             <h2>All Appointments</h2>
             <div className="appointment-cards">
               {appointments.map((apt) => (
-                <div className="card" key={apt._id || apt.id}>
+                <div className="card" key={apt.id || apt._id}>
+                  <p><strong>Appointment ID:</strong> {apt.id}</p>
                   <h1>Appointment with {apt.patientName}</h1>
                   <h2>Dr. {apt.doctorName}</h2>
                   <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString() : '—'}</h2>
@@ -423,7 +455,7 @@ function AppointmentViewAdmin() {
                     >
                       Edit</button>
                     <button 
-                      onClick={() => handleDeleteAppointment(apt.id || apt._id)}
+                      onClick={() => openDeleteConfirmation(apt)}
                       style={{ backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
                     >
                       Delete
