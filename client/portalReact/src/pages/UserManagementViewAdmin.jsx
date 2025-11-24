@@ -51,6 +51,16 @@ function UserManagementViewAdmin() {
     };
 
     const handleSave = async () => {
+        // Validate required fields
+        if (!editingUser && (!formData.firstName || !formData.lastName || !formData.password || !formData.username || !formData.role)) {
+            addNotification("Please fill all fields", 'warning');
+            return;
+        }
+        if (editingUser && (!formData.firstName || !formData.lastName || !formData.username || !formData.role)) {
+            addNotification("Please fill all required fields (password not required for existing users)", 'warning');
+            return;
+        }
+
         try {
             const token = localStorage.getItem("token");
             const method = editingUser ? "PUT" : "POST";
@@ -71,8 +81,15 @@ function UserManagementViewAdmin() {
             });
 
             if (!res.ok) {
-                const errText = await res.text();
-                addNotification("Error saving user: " + errText, 'error');
+                let errorMessage = "Error saving user";
+                try {
+                    const errData = await res.json();
+                    errorMessage = errData.error || errData.message || errorMessage;
+                } catch {
+                    const errText = await res.text();
+                    errorMessage = errText || errorMessage;
+                }
+                addNotification(errorMessage, 'error');
                 return;
             }
 
