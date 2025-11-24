@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { parseJwt } from '../hooks/useLogin';
+import { useNotification } from '../context/NotificationContext';
+import ConfirmationModal from '../components/ConfirmationModal'; 
 import Sidebar from '../components/Sidebar.jsx';
 import { useTheme } from '../context/ThemeContext';
-import { useNotification } from '../context/NotificationContext';
 
 function AppointmentViewAdmin() {
-  const { addNotification } = useNotification(); 
   const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [users, setUsers] = useState([]);
@@ -28,7 +28,10 @@ function AppointmentViewAdmin() {
     patientId: "",
     doctorId: ""
   });
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); 
+  const [appointmentToDelete, setAppointmentToDelete] = useState(null); 
   const { darkMode } = useTheme();
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     fetchUsers();
@@ -133,9 +136,10 @@ function AppointmentViewAdmin() {
       if (!res.ok) {
         const errData = await res.json();
         addNotification("Failed to create appointment: " + (errData.error || "Unknown error"), 'error');
+        return;
       }
 
-       addNotification("Appointment created successfully!", 'success');
+      addNotification("Appointment created successfully!", 'success');
       
       setFormData({
         date: "",
@@ -154,14 +158,19 @@ function AppointmentViewAdmin() {
     }
   };
 
-  const handleDeleteAppointment = async (appointmentId) => {
-    if (!window.confirm("Are you sure you want to delete this appointment?")) {
-      return;
-    }
+  // Open delete confirmation modal
+  const openDeleteConfirmation = (appointment) => {
+    setAppointmentToDelete(appointment);
+    setShowDeleteConfirmation(true);
+  };
+
+  // Handle confirmed deletion
+  const handleConfirmDelete = async () => {
+    if (!appointmentToDelete) return;
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentId}`, {
+      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentToDelete.id || appointmentToDelete._id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -178,6 +187,15 @@ function AppointmentViewAdmin() {
       console.error(err);
       addNotification("Error deleting appointment: " + err.message, 'error');
     }
+
+    setShowDeleteConfirmation(false);
+    setAppointmentToDelete(null);
+  };
+
+  // Handle cancel deletion
+  const handleCancelDelete = () => {
+    setShowDeleteConfirmation(false);
+    setAppointmentToDelete(null);
   };
 
   const openEdit = (apt) => {
@@ -234,6 +252,7 @@ function AppointmentViewAdmin() {
       if (!res.ok) {
         const errData = await res.json();
         addNotification("Failed to update appointment: " + (errData.error || "Unknown error"), 'error');
+        return;
       }
 
       await fetchAppointments();
@@ -251,6 +270,18 @@ function AppointmentViewAdmin() {
   return (
     <div className="dashboard-container">
       <Sidebar role="admin" />
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirmation}
+        title="Delete Appointment?"
+        message={`Are you sure you want to delete the appointment between ${appointmentToDelete?.patientName} and Dr. ${appointmentToDelete?.doctorName} on ${appointmentToDelete?.date ? new Date(appointmentToDelete.date).toLocaleDateString() : ''}?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        confirmText="Delete Appointment"
+        cancelText="Cancel"
+        isDangerous={true}
+      />
 
       <main className="main-content">
         <header className="main-header">
@@ -423,7 +454,7 @@ function AppointmentViewAdmin() {
                     >
                       Edit</button>
                     <button 
-                      onClick={() => handleDeleteAppointment(apt.id || apt._id)}
+                      onClick={() => openDeleteConfirmation(apt)}
                       style={{ backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
                     >
                       Delete

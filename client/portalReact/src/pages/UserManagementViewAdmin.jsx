@@ -1,7 +1,9 @@
+// src/pages/UserManagementViewAdmin.jsx (UPDATED)
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
-import { useNotification } from '../context/NotificationContext'; 
+import { useNotification } from '../context/NotificationContext';
+import ConfirmationModal from '../components/ConfirmationModal'; 
 import Sidebar from '../components/Sidebar.jsx';
 
 function UserManagementViewAdmin() {
@@ -15,6 +17,8 @@ function UserManagementViewAdmin() {
         role: "patient",
         password: "",
     });
+    const [showConfirmation, setShowConfirmation] = useState(false); 
+    const [userToDelete, setUserToDelete] = useState(null); 
     const { addNotification } = useNotification();
     const handleLogout = useHandleLogout();
 
@@ -88,28 +92,57 @@ function UserManagementViewAdmin() {
         }
     };
 
-    const handleDelete = async (id) => {
-        const token = localStorage.getItem("token");
+    // Open confirmation modal to ensure user wants to delete user
+    const openDeleteConfirmation = (userId, userName) => {
+        setUserToDelete({ id: userId, name: userName });
+        setShowConfirmation(true);
+    };
+
+    // User wants to delete user
+    const handleConfirmDelete = async () => {
+        if (!userToDelete) return;
+
         try {
-            await fetch(`http://localhost:3000/api/users/${id}`, {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`http://localhost:3000/api/users/${userToDelete.id}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (res.ok) {
                 addNotification("User deleted successfully!", 'success');
-            }
-            else {
+            } else {
                 addNotification("Failed to delete user", 'error');
             }
         } catch (err) {
             addNotification("Error deleting user: " + err.message, 'error');
         }
+        
+        setShowConfirmation(false);
+        setUserToDelete(null);
         fetchUsers();
+    };
+
+    // User doesnt want to delete user
+    const handleCancelDelete = () => {
+        setShowConfirmation(false);
+        setUserToDelete(null);
     };
 
     return (
         <div className="dashboard-container">
             <Sidebar role="admin" />
+
+            {/* CONFIRMATION MODAL */}
+            <ConfirmationModal
+                isOpen={showConfirmation}
+                title="Delete User?"
+                message={`Are you sure you want to delete ${userToDelete?.name}? This action cannot be undone.`}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                confirmText="Delete User"
+                cancelText="Cancel"
+                isDangerous={true}
+            />
 
             <main className="main-content">
                 <header className="main-header">
@@ -187,7 +220,12 @@ function UserManagementViewAdmin() {
                                                 password: "",
                                             });
                                         }}>Edit</button>
-                                        <button onClick={() => handleDelete(u._id)}>Delete</button>
+                                        <button 
+                                            onClick={() => openDeleteConfirmation(u._id, `${u.firstName} ${u.lastName}`)}
+                                            style={{ backgroundColor: '#d32f2f', color: 'white' }}
+                                        >
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

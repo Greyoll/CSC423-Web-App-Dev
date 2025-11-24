@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { parseJwt } from '../hooks/useLogin';
 import { useNotification } from '../context/NotificationContext';
+import ConfirmationModal from '../components/ConfirmationModal'; 
 import Sidebar from '../components/Sidebar.jsx';
 
 function AppointmentViewDoctor() {
@@ -8,6 +9,8 @@ function AppointmentViewDoctor() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false); 
+  const [appointmentToDelete, setAppointmentToDelete] = useState(null); 
   const { addNotification } = useNotification();
 
   useEffect(() => {
@@ -58,35 +61,61 @@ function AppointmentViewDoctor() {
       }
   };
 
-  const handleCancelAppointment = async (appointmentId) => {
-    if (!window.confirm("Are you sure you want to delete this appointment?")) {
-      return;
-    }
+  // Open confirmation modal
+  const openCancelConfirmation = (appointment) => {
+    setAppointmentToDelete(appointment);
+    setShowConfirmation(true);
+  };
+
+  // Handle confirmed cancellation
+  const handleConfirmCancel = async () => {
+    if (!appointmentToDelete) return;
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentId}`, {
+      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentToDelete.id || appointmentToDelete._id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) {
         const errText = await res.text();
-        addNotification("Failed to delete appointment: " + errText, 'error');
+        addNotification("Failed to cancel appointment: " + errText, 'error');
         return;
       }
 
-      addNotification("Appointment deleted successfully!", 'success');
+      addNotification("Appointment cancelled successfully!", 'success');
       fetchAppointments();
     } catch (err) {
       console.error(err);
-      addNotification("Error deleting appointment: " + err.message, 'error');
+      addNotification("Error cancelling appointment: " + err.message, 'error');
     }
+
+    setShowConfirmation(false);
+    setAppointmentToDelete(null);
+  };
+
+  // Handle cancel confirmation
+  const handleCancelConfirmation = () => {
+    setShowConfirmation(false);
+    setAppointmentToDelete(null);
   };
 
   return (
     <div className="dashboard-container">
       <Sidebar role="doctor" />
+
+      {/* CONFIRMATION MODAL */}
+      <ConfirmationModal
+        isOpen={showConfirmation}
+        title="Cancel Appointment?"
+        message={`Are you sure you want to cancel the appointment with ${appointmentToDelete?.patientName} on ${appointmentToDelete?.date ? new Date(appointmentToDelete.date).toLocaleDateString() : ''}?`}
+        onConfirm={handleConfirmCancel}
+        onCancel={handleCancelConfirmation}
+        confirmText="Cancel Appointment"
+        cancelText="Keep Appointment"
+        isDangerous={true}
+      />
 
       <main className="main-content">
         <header className="main-header">
@@ -112,7 +141,7 @@ function AppointmentViewDoctor() {
                   <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString()}</p>
                   <div style={{ marginTop: 10 }}>
                     <button 
-                      onClick={() => handleCancelAppointment(apt.id || apt._id)}
+                      onClick={() => openCancelConfirmation(apt)}
                       style={{ backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
                     >
                       Cancel Appointment

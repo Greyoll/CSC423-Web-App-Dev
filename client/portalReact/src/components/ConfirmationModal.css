@@ -1,0 +1,143 @@
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1500;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.confirmation-modal {
+  background-color: white;
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.confirmation-modal h2 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  color: #000;
+  font-weight: 600;
+}
+
+.confirmation-modal p {
+  margin: 0 0 24px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.confirmation-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #d0d0d0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.confirm-btn:hover {
+  background-color: #1976d2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.confirm-btn.dangerous {
+  background-color: #d32f2f;
+}
+
+.confirm-btn.dangerous:hover {
+  background-color: #b71c1c;
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+/* Dark mode support */
+body.dark-mode .confirmation-modal {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .confirmation-modal h2 {
+  color: #e0e0e0;
+}
+
+body.dark-mode .confirmation-modal p {
+  color: #b0b0b0;
+}
+
+body.dark-mode .cancel-btn {
+  background-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-mode .cancel-btn:hover {
+  background-color: #555;
+}
+
+@media (max-width: 480px) {
+  .confirmation-modal {
+    padding: 24px;
+    max-width: 90vw;
+  }
+
+  .confirmation-buttons {
+    flex-direction: column-reverse;
+  }
+
+  .confirmation-btn {
+    width: 100%;
+  }
+}
