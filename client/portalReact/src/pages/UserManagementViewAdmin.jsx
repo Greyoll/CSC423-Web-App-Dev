@@ -65,7 +65,7 @@ function UserManagementViewAdmin() {
             const token = localStorage.getItem("token");
             const method = editingUser ? "PUT" : "POST";
             const url = editingUser
-                ? `http://localhost:3000/api/users/${editingUser._id}`
+                ? `http://localhost:3000/api/users/${editingUser.id}`
                 : "http://localhost:3000/api/users";
 
             const payload = { ...formData };
@@ -210,6 +210,7 @@ function UserManagementViewAdmin() {
                     <table>
                         <thead>
                             <tr>
+                                <th>ID</th>
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>Username</th>
@@ -220,7 +221,8 @@ function UserManagementViewAdmin() {
                         </thead>
                         <tbody>
                             {users.map((u) => (
-                                <tr key={u._id}>
+                                <tr key={u.id}>
+                                    <td>{u.id}</td>
                                     <td>{u.firstName}</td>
                                     <td>{u.lastName}</td>
                                     <td>{u.username}</td>
@@ -238,7 +240,7 @@ function UserManagementViewAdmin() {
                                             });
                                         }}>Edit</button>
                                         <button 
-                                            onClick={() => openDeleteConfirmation(u._id, `${u.firstName} ${u.lastName}`)}
+                                            onClick={() => openDeleteConfirmation(u.id, `${u.firstName} ${u.lastName}`)}
                                             style={{ backgroundColor: '#d32f2f', color: 'white' }}
                                         >
                                             Delete

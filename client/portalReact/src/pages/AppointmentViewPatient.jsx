@@ -138,7 +138,7 @@ function AppointmentViewPatient() {
             <h2>Your Appointments</h2>
             <div className="appointment-cards">
               {appointments.map((apt) => (
-                <div className="card" key={apt._id || apt.id}>
+                <div className="card" key={apt.id || apt._id}>
                   <h1>Appointment with Dr. {apt.doctorName}</h1>
                   <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
                   <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
