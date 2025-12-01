@@ -66,6 +66,7 @@ function DashboardDoctor() {
     fetchAppointments();
   }, []);
 
+  const uniquePatientCount = new Set(appointments.map(a => a.patientId)).size;
   const todayAppointments = appointments.filter(apt => isToday(apt.date));
 
   return (
@@ -95,7 +96,7 @@ function DashboardDoctor() {
           <div className="stat-card">
             <div className="stat-icon"><img src="/Images/users.png"/></div>
             <div className="stat-content">
-              <h3>{appointments.length}</h3>
+              <h3>{uniquePatientCount}</h3>
               <p>Total Patients</p>
             </div>
           </div>
@@ -124,7 +125,7 @@ function DashboardDoctor() {
               </div>
             ) : (
               todayAppointments.map((apt) => (
-                <div className="card" key={apt._id || apt.id}>
+                <div className="card" key={apt.id || apt._id}>
                   <h1><img src="/Images/user.png"/> {apt.patientName || 'Unknown Patient'}</h1>
                   <h2><img src="/Images/clipboard-list.png"/> {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
                   <p className="time-badge"><img src="/Images/clock.png"/> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>

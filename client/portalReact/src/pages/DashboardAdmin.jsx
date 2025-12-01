@@ -7,6 +7,9 @@ function DashboardAdmin() {
   const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [loadingAppts, setLoadingAppts] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
   const handleLogout = useHandleLogout();
 
   // Helper function to convert 24hr to 12hr format
@@ -20,43 +23,46 @@ function DashboardAdmin() {
   };
 
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      const payload = parseJwt(token);
+      if (!payload) return;
+
+      const userId = payload.id;
+
+      setUserName(`${payload.firstName || ""} ${payload.lastName || ""}`.trim());
+
       try {
-        const token = localStorage.getItem("token");
-        const payload = parseJwt(token);
-        if (!payload) {
-          console.error("Invalid token");
-          return;
-        }
-        const userId = payload.id;
-
-        // Set full name from JWT
-        const firstName = payload.firstName || "";
-        const lastName = payload.lastName || "";
-        setUserName(`${firstName} ${lastName}`.trim() || "User");
-
+        // Fetch appointments
         const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        setAppointments(res.ok ? await res.json() : []);
 
-        if (res.ok) {
-          const data = await res.json();
-          setAppointments(Array.isArray(data) ? data : []);
-        }
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
+        // Fetch users
+        const userRes = await fetch(`http://localhost:3000/api/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const userData = userRes.ok ? await userRes.json() : [];
+        setUsers(userData);
+
+        // Filter doctors
+        const doctorUsers = userData.filter((u) => u.role === "doctor");
+        setDoctors(doctorUsers);
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoadingAppts(false);
+        setLoadingUsers(false);
       }
     };
 
-    fetchAppointments();
+    fetchData();
   }, []);
 
   return (
     <div className="dashboard-container">
       <Sidebar role="admin" />
-
       <main className="main-content">
         <header className="main-header">
           <div>
@@ -80,14 +86,14 @@ function DashboardAdmin() {
           <div className="stat-card">
             <div className="stat-icon"><img src="/Images/users.png"/></div>
             <div className="stat-content">
-              <h3>24</h3>
+              <h3>{loadingUsers ? "...": users.length}</h3>
               <p>Active Users</p>
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-icon"><img src="/Images/stethoscope.png"/></div>
             <div className="stat-content">
-              <h3>8</h3>
+              <h3>{loadingUsers ? "…" : doctors.length}</h3>
               <p>Doctors</p>
             </div>
           </div>
@@ -116,7 +122,7 @@ function DashboardAdmin() {
               </div>
             ) : (
               appointments.slice(0, 3).map((apt) => (
-                <div className="card" key={apt._id || apt.id}>
+                <div className="card" key={apt.id || apt._id}>
                   <h1><img src="/Images/user.png"/> {apt.patientName} with Dr. {apt.doctorName}</h1>
                   <h2><img src="/Images/calendar-days.png"/> {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
                   <p className="time-badge"><img src="/Images/clock.png"/> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
