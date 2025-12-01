@@ -81,6 +81,12 @@ function AppointmentViewAdmin() {
       return;
     }
 
+    // Basic validation: end time should be after start time
+    if (formData.startTime >= formData.endTime) {
+      alert("End time must be after start time");
+      return;
+    }
+
     try {
       setIsCreating(true);
       const token = localStorage.getItem("token");
@@ -103,8 +109,8 @@ function AppointmentViewAdmin() {
       });
 
       if (!res.ok) {
-        const errText = await res.text();
-        alert("Failed to create appointment: " + errText);
+        const errData = await res.json().catch(() => ({ error: "Unknown error" }));
+        alert(errData.error || "Failed to create appointment");
         return;
       }
 
@@ -185,6 +191,12 @@ function AppointmentViewAdmin() {
       return;
     }
 
+    // Basic validation: end time should be after start time
+    if (editFormData.startTime >= editFormData.endTime) {
+      alert("End time must be after start time");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const appointmentIdParam = editingAppointment.id || editingAppointment._id;
@@ -198,17 +210,11 @@ function AppointmentViewAdmin() {
       };
 
       const res = await fetch(`http://localhost:3000/api/appointments/${appointmentIdParam}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        const errText = await res.text();
-        alert("Failed to update appointment: " + errText);
+        const errData = await res.json().catch(() => ({ error: "Unknown error" }));
+        alert(errData.error || "Failed to update appointment");
         return;
       }
 
@@ -364,12 +370,11 @@ function AppointmentViewAdmin() {
               {appointments.map((apt) => (
                 <div className="card" key={apt._id || apt.id}>
                   <h1>Appointment #{apt.id}</h1>
-                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString() : '—'}</h2>
+                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { timeZone: 'UTC' }) : '—'}</h2>
                   <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
                   <p><strong>Patient ID:</strong> {apt.patientId}</p>
                   <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
-                  <p><strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString() : '—'}</p>
-
+                  <p><strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' }) : '—'}</p>
                   <div style={{ marginTop: 10 }}>
                     <button onClick={() => openEdit(apt)}
                       style={{ backgroundColor: '#aac0b9ff', color: 'white', padding: '5px 10px', cursor: 'pointer', marginRight: '10px' }}

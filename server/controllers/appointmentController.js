@@ -1,5 +1,55 @@
 const Appointment = require("../models/appointmentModel");
 
+// Helper function to check if two time ranges overlap
+const timesOverlap = (start1, end1, start2, end2) => {
+    // Convert times to comparable format (minutes from midnight)
+    const toMinutes = (timeStr) => {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return hours * 60 + minutes;
+    };
+    
+    const s1 = toMinutes(start1);
+    const e1 = toMinutes(end1);
+    const s2 = toMinutes(start2);
+    const e2 = toMinutes(end2);
+    
+    // Check if ranges overlap: start1 < end2 AND start2 < end1
+    return s1 < e2 && s2 < e1;
+};
+
+// Helper function to check for conflicting appointments
+const checkConflict = async (date, startTime, endTime, doctorId, excludeId = null) => {
+    // Normalize date to compare only date part (ignore time)
+    const appointmentDate = new Date(date);
+    const startOfDay = new Date(appointmentDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(appointmentDate.setHours(23, 59, 59, 999));
+    
+    // Find all appointments for the same doctor on the same day
+    const query = {
+        doctorId: doctorId,
+        date: { $gte: startOfDay, $lte: endOfDay }
+    };
+    
+    // Exclude current appointment when editing
+    if (excludeId !== null) {
+        query.id = { $ne: excludeId };
+    }
+    
+    const existingAppointments = await Appointment.find(query);
+    
+    // Check if any existing appointment overlaps with the new time slot
+    for (const apt of existingAppointments) {
+        if (timesOverlap(startTime, endTime, apt.startTime, apt.endTime)) {
+            return {
+                conflict: true,
+                message: `Time conflict: Doctor already has an appointment from ${apt.startTime} to ${apt.endTime} on this date`
+            };
+        }
+    }
+    
+    return { conflict: false };
+};
+
 // Create appointment 
 module.exports.createAppointment = async (req, res) => {
     try {
@@ -8,6 +58,12 @@ module.exports.createAppointment = async (req, res) => {
         // Make sure all fields are filled
         if (!date || !startTime || !endTime || !patientId || !doctorId) {
             return res.status(400).json({ error: "Please fill in all fields" });
+        }
+
+        // Check for time conflicts
+        const conflictCheck = await checkConflict(date, startTime, endTime, doctorId);
+        if (conflictCheck.conflict) {
+            return res.status(409).json({ error: conflictCheck.message });
         }
 
         // Generate new Id
@@ -61,9 +117,20 @@ module.exports.getAppointments = async (req, res) => {
 // Update appointment
 module.exports.updateAppointment = async (req, res) => {
     try {
+        const appointmentId = parseInt(req.params.id);
+        const { date, startTime, endTime, doctorId } = req.body;
+
+        // Check for time conflicts (excluding the current appointment being edited)
+        if (date && startTime && endTime && doctorId) {
+            const conflictCheck = await checkConflict(date, startTime, endTime, doctorId, appointmentId);
+            if (conflictCheck.conflict) {
+                return res.status(409).json({ error: conflictCheck.message });
+            }
+        }
+
         const updates = { ...req.body, lastUpdated: new Date() };
         const updatedAppointment = await Appointment.findOneAndUpdate(
-            { id: req.params.id },
+            { id: appointmentId },
             updates,
             { new: true }
         );

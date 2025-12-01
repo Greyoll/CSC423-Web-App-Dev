@@ -105,11 +105,11 @@ function AppointmentViewDoctor() {
               {appointments.map((apt) => (
                 <div className="card" key={apt._id || apt.id}>
                   <h1>Appointment #{apt.id}</h1>
-                  <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { timeZone: 'UTC' }) : '—'}</h2>
                   <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
                   <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
                   <p><strong>Patient ID:</strong> {apt.patientId}</p>
-                  <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString()}</p>
+                  <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' })}</p>
                   <div style={{ marginTop: 10 }}>
                     <button 
                       onClick={() => handleCancelAppointment(apt.id || apt._id)}
