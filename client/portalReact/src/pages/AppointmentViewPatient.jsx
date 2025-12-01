@@ -13,6 +13,16 @@ function AppointmentViewPatient() {
   const [appointmentToDelete, setAppointmentToDelete] = useState(null); 
   const { addNotification } = useNotification();
 
+  // Helper function to convert 24hr to 12hr format
+  const formatTime = (time24) => {
+    if (!time24) return '—';
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const payload = parseJwt(token);
@@ -138,12 +148,10 @@ function AppointmentViewPatient() {
             <h2>Your Appointments</h2>
             <div className="appointment-cards">
               {appointments.map((apt) => (
-                <div className="card" key={apt._id || apt.id}>
-                  <h1>Appointment #{apt.id}</h1>
+                <div className="card" key={apt.id || apt._id}>
+                  <h1>Appointment with Dr. {apt.doctorName || 'Unknown'}</h1>
                   <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { timeZone: 'UTC' }) : '—'}</h2>
-                  <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
-                  <p><strong>Patient ID:</strong> {apt.patientId}</p>
-                  <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
+                  <p><strong>Time:</strong> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
                   <p><strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' }) : '—'}</p>
                   <div style={{ marginTop: 10 }}>
                     <button 
