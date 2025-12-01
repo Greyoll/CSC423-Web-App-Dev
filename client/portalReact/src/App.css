@@ -180,6 +180,55 @@ nav a { text-decoration: none; color: #000; font-weight: 500; }
    ================================= */
 .dashboard-container { display: flex; min-height: 100vh; }
 
+/* Stat Cards */
+.stat-card {
+  background-color: #f0f0f0;
+  color: #000;
+  padding: 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 2rem;
+  opacity: 0.8;
+}
+
+.stat-content h3 {
+  font-size: 1.8rem;
+  margin: 0;
+  font-weight: 700;
+  color: #000;
+}
+
+.stat-content p {
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0 0;
+  color: #555;
+}
+
+.dark-mode .stat-card {
+  background-color: #2a2a2a;
+  border-color: #444;
+}
+
+.dark-mode .stat-content h3 {
+  color: #e0e0e0;
+}
+
+.dark-mode .stat-content p {
+  color: #b0b0b0;
+}
+
 /* =================================
    SIDEBAR
    ================================= */
