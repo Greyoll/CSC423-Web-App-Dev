@@ -19,31 +19,51 @@ const timesOverlap = (start1, end1, start2, end2) => {
 };
 
 // Helper function to check for conflicting appointments
-const checkConflict = async (date, startTime, endTime, doctorId, excludeId = null) => {
+const checkConflict = async (date, startTime, endTime, doctorId, patientId, excludeId = null) => {
     // Normalize date to compare only date part (ignore time)
     const appointmentDate = new Date(date);
     const startOfDay = new Date(appointmentDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(appointmentDate.setHours(23, 59, 59, 999));
     
-    // Find all appointments for the same doctor on the same day
-    const query = {
+    // Check for doctor conflicts
+    const doctorQuery = {
         doctorId: doctorId,
+        date: { $gte: startOfDay, $lte: endOfDay }
+    };
+    
+    // Check for patient conflicts
+    const patientQuery = {
+        patientId: patientId,
         date: { $gte: startOfDay, $lte: endOfDay }
     };
     
     // Exclude current appointment when editing
     if (excludeId !== null) {
-        query.id = { $ne: excludeId };
+        doctorQuery.id = { $ne: excludeId };
+        patientQuery.id = { $ne: excludeId };
     }
     
-    const existingAppointments = await Appointment.find(query);
+    const [doctorAppointments, patientAppointments] = await Promise.all([
+        Appointment.find(doctorQuery),
+        Appointment.find(patientQuery)
+    ]);
     
-    // Check if any existing appointment overlaps with the new time slot
-    for (const apt of existingAppointments) {
+    // Check if any existing doctor appointment overlaps with the new time slot
+    for (const apt of doctorAppointments) {
         if (timesOverlap(startTime, endTime, apt.startTime, apt.endTime)) {
             return {
                 conflict: true,
                 message: `Time conflict: Doctor already has an appointment from ${apt.startTime} to ${apt.endTime} on this date`
+            };
+        }
+    }
+    
+    // Check if any existing patient appointment overlaps with the new time slot
+    for (const apt of patientAppointments) {
+        if (timesOverlap(startTime, endTime, apt.startTime, apt.endTime)) {
+            return {
+                conflict: true,
+                message: `Time conflict: Patient already has an appointment from ${apt.startTime} to ${apt.endTime} on this date`
             };
         }
     }
@@ -61,8 +81,8 @@ module.exports.createAppointment = async (req, res) => {
             return res.status(400).json({ error: "Please fill in all fields" });
         }
 
-        // Check for time conflicts
-        const conflictCheck = await checkConflict(date, startTime, endTime, doctorId);
+        // Check for time conflicts (both doctor and patient)
+        const conflictCheck = await checkConflict(date, startTime, endTime, doctorId, patientId);
         if (conflictCheck.conflict) {
             return res.status(409).json({ error: conflictCheck.message });
         }
@@ -129,15 +149,15 @@ module.exports.getAppointments = async (req, res) => {
     }
 };
 
-// Update appointment WITH double booking check
+// Update appointment WITH double booking check for both doctor and patient
 module.exports.updateAppointment = async (req, res) => {
     try {
         const appointmentId = parseInt(req.params.id);
-        const { date, startTime, endTime, doctorId } = req.body;
+        const { date, startTime, endTime, doctorId, patientId } = req.body;
 
         // Check for time conflicts (excluding the current appointment being edited)
-        if (date && startTime && endTime && doctorId) {
-            const conflictCheck = await checkConflict(date, startTime, endTime, doctorId, appointmentId);
+        if (date && startTime && endTime && doctorId && patientId) {
+            const conflictCheck = await checkConflict(date, startTime, endTime, doctorId, patientId, appointmentId);
             if (conflictCheck.conflict) {
                 return res.status(409).json({ error: conflictCheck.message });
             }

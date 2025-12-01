@@ -9,6 +9,24 @@ function DashboardPatient() {
   const [loading, setLoading] = useState(true);
   const handleLogout = useHandleLogout();
 
+  // Helper function to convert 24hr to 12hr format
+  const formatTime = (time24) => {
+    if (!time24) return '—';
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
+  // Check if appointment is upcoming
+  const isUpcoming = (dateStr) => {
+    const aptDate = new Date(dateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return aptDate >= today;
+  };
+
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
@@ -43,53 +61,71 @@ function DashboardPatient() {
     fetchAppointments();
   }, []);
 
+  const upcomingAppointments = appointments.filter(apt => isUpcoming(apt.date));
+
   return (
     <div className="dashboard-container">
       <Sidebar role="patient" />
 
       <main className="main-content">
         <header className="main-header">
-          <h1>Dashboard</h1>
+          <div>
+            <h1>Welcome back, {userName}!</h1>
+            <p style={{ color: '#7f8c8d', marginTop: '0.5rem' }}>Here's your health overview</p>
+          </div>
           <div className="user-info">
             <span>{userName}</span>
           </div>
         </header>
+
+        {/* Quick Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+          <div className="stat-card">
+            <div className="stat-icon"><img src="/Images/calendar-days.png"/></div>
+            <div className="stat-content">
+              <h3>{upcomingAppointments.length}</h3>
+              <p>Upcoming Appointments</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon"><img src="/Images/clipboard-list.png"/></div>
+            <div className="stat-content">
+              <h3>{appointments.length}</h3>
+              <p>Total Appointments</p>
+            </div>
+          </div>
+        </div>
+
         <section className="appointments-section">
-          <h2>Upcoming Appointments</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h2>Upcoming Appointments</h2>
+            <Link to="/patient/appointments" style={{ 
+              color: '#3498db', 
+              textDecoration: 'none', 
+              fontWeight: '600',
+              fontSize: '0.95rem'
+            }}>
+              View All →
+            </Link>
+          </div>
           <div className="appointment-cards">
             {loading ? (
               <p>Loading appointments...</p>
-            ) : appointments.length === 0 ? (
-              <p>No appointments scheduled.</p>
+            ) : upcomingAppointments.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-icon"></div>
+                <h3>No Upcoming Appointments</h3>
+                <p>You don't have any appointments scheduled.</p>
+              </div>
             ) : (
-              appointments.map((apt) => (
-                <div className="card" key={apt._id || apt.id}>
-                  <h1>Appointment #{apt.id}</h1>
-                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { timeZone: 'UTC' }) : '—'}</h2>
-                  <p>{apt.startTime} - {apt.endTime}</p>
+              upcomingAppointments.slice(0, 3).map((apt) => (
+                <div className="card" key={apt.id || apt._id}>
+                  <h1>Dr. {apt.doctorName || 'Unknown'}</h1>
+                  <h2><img src="/Images/calendar-days.png"/> {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
+                  <p className="time-badge"><img src="/Images/clock.png"/> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
                 </div>
               ))
             )}
-          </div>
-        </section>
-        <section className="appointments-section">
-          <h2>Appointment History</h2>
-          <div className="appointment-cards">
-            <div className="card">
-              <h1>Blood Test</h1>
-              <h2>Dr. Stanley Valdez</h2>
-              <p>04/20/2022 06:09AM</p>
-            </div>
-            <div className="card">
-              <h1>Physical</h1>
-              <h2>Dr. Jenny E</h2>
-              <p>07/07/2023 07:50AM</p>
-            </div>
-            <div className="card">
-              <h1>General Wellness</h1>
-              <h2>Dr. James H</h2>
-              <p>12/30/2023 08:00AM</p>
-            </div>
           </div>
         </section>
       </main>
