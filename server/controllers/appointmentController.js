@@ -1,4 +1,5 @@
 const Appointment = require("../models/appointmentModel");
+const User = require("../models/userModel");
 
 // Helper function to check if two time ranges overlap
 const timesOverlap = (start1, end1, start2, end2) => {
@@ -107,14 +108,28 @@ module.exports.getAppointments = async (req, res) => {
             return res.status(403).json({ error: "Unauthorized role, how did you even get here????" });
         }
 
-        return res.status(200).json(appointments);
+        // Get more details for all appointments
+        const betterApts = await Promise.all(
+            appointments.map(async (apt) => {
+                const doctor = await User.findOne({ id: apt.doctorId });
+                const patient = await User.findOne({ id: apt.patientId });
+
+                return {
+                    ...apt.toObject(),
+                    doctorName: doctor ? `${doctor.firstName} ${doctor.lastName}` : "Unknown Doctor",
+                    patientName: patient ? `${patient.firstName} ${patient.lastName}` : "Unknown Patient"
+                };
+            })
+        );
+
+        return res.status(200).json(betterApts);
     } catch(err) {
         console.error(err);
-         res.status(500).json({ error: "An error has occured when trying to fetch appointments, check console" });
+         res.status(500).json({ error: "An error has occurred when trying to fetch appointments, check console" });
     }
 };
 
-// Update appointment
+// Update appointment WITH double booking check
 module.exports.updateAppointment = async (req, res) => {
     try {
         const appointmentId = parseInt(req.params.id);
@@ -134,9 +149,7 @@ module.exports.updateAppointment = async (req, res) => {
             updates,
             { new: true }
         );
-        if (!updatedAppointment) {
-            return res.status(404).json({ error: "Appointment not found" });
-        }
+
         res.status(200).json({ message: "Appointment updated", appointment: updatedAppointment });
     } catch(err) {
         console.error(err);

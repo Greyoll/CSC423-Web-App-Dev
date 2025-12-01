@@ -1,6 +1,9 @@
+// src/pages/UserManagementViewAdmin.jsx (UPDATED)
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { parseJwt, useHandleLogout } from '../hooks/useLogin';
+import { useNotification } from '../context/NotificationContext';
+import ConfirmationModal from '../components/ConfirmationModal'; 
 import Sidebar from '../components/Sidebar.jsx';
 
 function UserManagementViewAdmin() {
@@ -14,6 +17,9 @@ function UserManagementViewAdmin() {
         role: "patient",
         password: "",
     });
+    const [showConfirmation, setShowConfirmation] = useState(false); 
+    const [userToDelete, setUserToDelete] = useState(null); 
+    const { addNotification } = useNotification();
     const handleLogout = useHandleLogout();
 
     useEffect(() => {
@@ -40,16 +46,26 @@ function UserManagementViewAdmin() {
             const data = await res.json();
             setUsers(data);
         } catch (err) {
-            alert("Couldn't fetch users");
+            addNotification("Couldn't fetch users", 'error');
         }
     };
 
     const handleSave = async () => {
+        // Validate required fields
+        if (!editingUser && (!formData.firstName || !formData.lastName || !formData.password || !formData.username || !formData.role)) {
+            addNotification("Please fill all fields", 'warning');
+            return;
+        }
+        if (editingUser && (!formData.firstName || !formData.lastName || !formData.username || !formData.role)) {
+            addNotification("Please fill all required fields (password not required for existing users)", 'warning');
+            return;
+        }
+
         try {
             const token = localStorage.getItem("token");
             const method = editingUser ? "PUT" : "POST";
             const url = editingUser
-                ? `http://localhost:3000/api/users/${editingUser._id}`
+                ? `http://localhost:3000/api/users/${editingUser.id}`
                 : "http://localhost:3000/api/users";
 
             const payload = { ...formData };
@@ -65,8 +81,15 @@ function UserManagementViewAdmin() {
             });
 
             if (!res.ok) {
-                const errText = await res.text();
-                alert("Error saving user: " + errText);
+                let errorMessage = "Error saving user";
+                try {
+                    const errData = await res.json();
+                    errorMessage = errData.error || errData.message || errorMessage;
+                } catch {
+                    const errText = await res.text();
+                    errorMessage = errText || errorMessage;
+                }
+                addNotification(errorMessage, 'error');
                 return;
             }
 
@@ -79,25 +102,64 @@ function UserManagementViewAdmin() {
             });
             setEditingUser(null);
             fetchUsers();
-            alert(editingUser ? "User updated successfully!" : "User added successfully!");
+            addNotification(editingUser ? "User updated successfully!" : "User added successfully!", 'success');
         } catch (err) {
             console.error(err);
-            alert("Error saving user. Check console for details.");
+            addNotification("Error saving user. Check console for details.", 'error');
         }
     };
 
-    const handleDelete = async (id) => {
-        const token = localStorage.getItem("token");
-        await fetch(`http://localhost:3000/api/users/${id}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-        });
+    // Open confirmation modal to ensure user wants to delete user
+    const openDeleteConfirmation = (userId, userName) => {
+        setUserToDelete({ id: userId, name: userName });
+        setShowConfirmation(true);
+    };
+
+    // User wants to delete user
+    const handleConfirmDelete = async () => {
+        if (!userToDelete) return;
+
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`http://localhost:3000/api/users/${userToDelete.id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.ok) {
+                addNotification("User deleted successfully!", 'success');
+            } else {
+                addNotification("Failed to delete user", 'error');
+            }
+        } catch (err) {
+            addNotification("Error deleting user: " + err.message, 'error');
+        }
+        
+        setShowConfirmation(false);
+        setUserToDelete(null);
         fetchUsers();
+    };
+
+    // User doesnt want to delete user
+    const handleCancelDelete = () => {
+        setShowConfirmation(false);
+        setUserToDelete(null);
     };
 
     return (
         <div className="dashboard-container">
             <Sidebar role="admin" />
+
+            {/* CONFIRMATION MODAL */}
+            <ConfirmationModal
+                isOpen={showConfirmation}
+                title="Delete User?"
+                message={`Are you sure you want to delete ${userToDelete?.name}? This action cannot be undone.`}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                confirmText="Delete User"
+                cancelText="Cancel"
+                isDangerous={true}
+            />
 
             <main className="main-content">
                 <header className="main-header">
@@ -148,6 +210,7 @@ function UserManagementViewAdmin() {
                     <table>
                         <thead>
                             <tr>
+                                <th>ID</th>
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>Username</th>
@@ -158,7 +221,8 @@ function UserManagementViewAdmin() {
                         </thead>
                         <tbody>
                             {users.map((u) => (
-                                <tr key={u._id}>
+                                <tr key={u.id}>
+                                    <td>{u.id}</td>
                                     <td>{u.firstName}</td>
                                     <td>{u.lastName}</td>
                                     <td>{u.username}</td>
@@ -175,7 +239,12 @@ function UserManagementViewAdmin() {
                                                 password: "",
                                             });
                                         }}>Edit</button>
-                                        <button onClick={() => handleDelete(u._id)}>Delete</button>
+                                        <button 
+                                            onClick={() => openDeleteConfirmation(u.id, `${u.firstName} ${u.lastName}`)}
+                                            style={{ backgroundColor: '#d32f2f', color: 'white' }}
+                                        >
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

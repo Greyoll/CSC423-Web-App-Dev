@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { parseJwt} from '../hooks/useLogin';
+import { useNotification } from '../context/NotificationContext';
+import ConfirmationModal from '../components/ConfirmationModal'; 
 import Sidebar from '../components/Sidebar.jsx';
 
 function AppointmentViewPatient() {
@@ -7,8 +9,10 @@ function AppointmentViewPatient() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false); 
+  const [appointmentToDelete, setAppointmentToDelete] = useState(null); 
+  const { addNotification } = useNotification();
 
-    // Use effect to get users name for display
   useEffect(() => {
     const token = localStorage.getItem("token");
     const payload = parseJwt(token);
@@ -46,6 +50,7 @@ function AppointmentViewPatient() {
         }
 
         const data = await res.json();
+        console.log("Fetched appointments:", data);
         setAppointments(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
@@ -56,35 +61,61 @@ function AppointmentViewPatient() {
       }
   };
 
-  const handleCancelAppointment = async (appointmentId) => {
-    if (!window.confirm("Are you sure you want to delete this appointment?")) {
-      return;
-    }
+  // Open confirmation modal
+  const openCancelConfirmation = (appointment) => {
+    setAppointmentToDelete(appointment);
+    setShowConfirmation(true);
+  };
+
+  // Handle confirmed cancellation
+  const handleConfirmCancel = async () => {
+    if (!appointmentToDelete) return;
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentId}`, {
+      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentToDelete.id || appointmentToDelete._id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) {
         const errText = await res.text();
-        alert("Failed to delete appointment: " + errText);
+        addNotification("Failed to cancel appointment: " + errText, 'error');
         return;
       }
 
-      alert("Appointment deleted successfully!");
+      addNotification("Appointment cancelled successfully!", 'success');
       fetchAppointments();
     } catch (err) {
       console.error(err);
-      alert("Error deleting appointment: " + err.message);
+      addNotification("Error cancelling appointment: " + err.message, 'error');
     }
+
+    setShowConfirmation(false);
+    setAppointmentToDelete(null);
+  };
+
+  // Handle cancel confirmation
+  const handleCancelConfirmation = () => {
+    setShowConfirmation(false);
+    setAppointmentToDelete(null);
   };
 
   return (
     <div className="dashboard-container">
       <Sidebar role="patient" />
+
+      {/* CONFIRMATION MODAL */}
+      <ConfirmationModal
+        isOpen={showConfirmation}
+        title="Cancel Appointment?"
+        message={`Are you sure you want to cancel your appointment with Dr. ${appointmentToDelete?.doctorName} on ${appointmentToDelete?.date ? new Date(appointmentToDelete.date).toLocaleDateString() : ''}?`}
+        onConfirm={handleConfirmCancel}
+        onCancel={handleCancelConfirmation}
+        confirmText="Cancel Appointment"
+        cancelText="Keep Appointment"
+        isDangerous={true}
+      />
 
       <main className="main-content">
         <header className="main-header">
@@ -116,7 +147,7 @@ function AppointmentViewPatient() {
                   <p><strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' }) : '—'}</p>
                   <div style={{ marginTop: 10 }}>
                     <button 
-                      onClick={() => handleCancelAppointment(apt.id || apt._id)}
+                      onClick={() => openCancelConfirmation(apt)}
                       style={{ backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
                     >
                       Cancel Appointment

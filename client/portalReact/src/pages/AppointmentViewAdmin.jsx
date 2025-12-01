@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { parseJwt } from '../hooks/useLogin';
+import { useNotification } from '../context/NotificationContext';
+import ConfirmationModal from '../components/ConfirmationModal'; 
 import Sidebar from '../components/Sidebar.jsx';
 import { useTheme } from '../context/ThemeContext';
 
 function AppointmentViewAdmin() {
   const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -25,13 +28,16 @@ function AppointmentViewAdmin() {
     patientId: "",
     doctorId: ""
   });
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); 
+  const [appointmentToDelete, setAppointmentToDelete] = useState(null); 
   const { darkMode } = useTheme();
+  const { addNotification } = useNotification();
 
   useEffect(() => {
+    fetchUsers();
     fetchAppointments();
   }, []);
 
-  // Use effect to get user's name for display
   useEffect(() => {
     const token = localStorage.getItem("token");
     const payload = parseJwt(token);
@@ -41,6 +47,21 @@ function AppointmentViewAdmin() {
       setUserName(`${firstName} ${lastName}`.trim() || "User");
     }
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:3000/api/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data);
+      }
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
+  };
 
   const fetchAppointments = async () => {
     try {
@@ -75,9 +96,19 @@ function AppointmentViewAdmin() {
     }
   };
 
+  const getDoctorName = (id) => {
+    const doctor = users.find(u => u.id === id && u.role === "doctor");
+    return doctor ? `${doctor.firstName} ${doctor.lastName}` : "Unknown";
+  };
+
+  const getPatientName = (id) => {
+    const patient = users.find(u => u.id === id && u.role === "patient");
+    return patient ? `${patient.firstName} ${patient.lastName}` : "Unknown";
+  };
+
   const handleAddAppointment = async () => {
     if (!formData.date || !formData.startTime || !formData.endTime || !formData.patientId || !formData.doctorId) {
-      alert("Please fill in all fields");
+      addNotification("Please fill in all fields", 'warning');
       return;
     }
 
@@ -109,12 +140,12 @@ function AppointmentViewAdmin() {
       });
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({ error: "Unknown error" }));
-        alert(errData.error || "Failed to create appointment");
+        const errData = await res.json();
+        addNotification("Failed to create appointment: " + (errData.error || "Unknown error"), 'error');
         return;
       }
 
-      alert("Appointment created successfully!");
+      addNotification("Appointment created successfully!", 'success');
       
       setFormData({
         date: "",
@@ -127,39 +158,52 @@ function AppointmentViewAdmin() {
       fetchAppointments();
     } catch (err) {
       console.error(err);
-      alert("Error creating appointment: " + err.message);
+      addNotification("Error creating appointment: " + err.message, 'error');
     } finally {
       setIsCreating(false);
     }
   };
 
-  const handleDeleteAppointment = async (appointmentId) => {
-    if (!window.confirm("Are you sure you want to delete this appointment?")) {
-      return;
-    }
+  // Open delete confirmation modal
+  const openDeleteConfirmation = (appointment) => {
+    setAppointmentToDelete(appointment);
+    setShowDeleteConfirmation(true);
+  };
+
+  // Handle confirmed deletion
+  const handleConfirmDelete = async () => {
+    if (!appointmentToDelete) return;
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentId}`, {
+      const res = await fetch(`http://localhost:3000/api/appointments/${appointmentToDelete.id || appointmentToDelete._id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) {
         const errText = await res.text();
-        alert("Failed to delete appointment: " + errText);
+        addNotification("Failed to delete appointment: " + errText, 'error');
         return;
       }
 
-      alert("Appointment deleted successfully!");
+      addNotification("Appointment deleted successfully!", 'success');
       fetchAppointments();
     } catch (err) {
       console.error(err);
-      alert("Error deleting appointment: " + err.message);
+      addNotification("Error deleting appointment: " + err.message, 'error');
     }
+
+    setShowDeleteConfirmation(false);
+    setAppointmentToDelete(null);
   };
 
-  // Open edit modal and prefill fields
+  // Handle cancel deletion
+  const handleCancelDelete = () => {
+    setShowDeleteConfirmation(false);
+    setAppointmentToDelete(null);
+  };
+
   const openEdit = (apt) => {
     setEditingAppointment(apt);
     setEditFormData({
@@ -182,12 +226,11 @@ function AppointmentViewAdmin() {
     });
   };
 
-  // Save edited appointment
   const saveEdit = async () => {
     if (!editingAppointment) return;
 
     if (!editFormData.date || !editFormData.startTime || !editFormData.endTime || !editFormData.patientId || !editFormData.doctorId) {
-      alert("Please fill in all fields");
+      addNotification("Please fill in all fields", 'warning');
       return;
     }
 
@@ -219,24 +262,38 @@ function AppointmentViewAdmin() {
       });
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({ error: "Unknown error" }));
-        alert(errData.error || "Failed to update appointment");
+        const errData = await res.json();
+        addNotification("Failed to update appointment: " + (errData.error || "Unknown error"), 'error');
         return;
       }
 
-      // refresh list after successful update
       await fetchAppointments();
       closeEdit();
-      alert("Appointment updated successfully!");
+      addNotification("Appointment updated successfully!", 'success');
     } catch (err) {
       console.error(err);
-      alert("Error updating appointment: " + err.message);
+      addNotification("Error updating appointment: " + err.message, 'error');
     }
   };
+
+  const doctors = users.filter(u => u.role === "doctor");
+  const patients = users.filter(u => u.role === "patient");
 
   return (
     <div className="dashboard-container">
       <Sidebar role="admin" />
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirmation}
+        title="Delete Appointment?"
+        message={`Are you sure you want to delete the appointment between ${appointmentToDelete?.patientName} and Dr. ${appointmentToDelete?.doctorName} on ${appointmentToDelete?.date ? new Date(appointmentToDelete.date).toLocaleDateString() : ''}?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        confirmText="Delete Appointment"
+        cancelText="Cancel"
+        isDangerous={true}
+      />
 
       <main className="main-content">
         <header className="main-header">
@@ -285,21 +342,31 @@ function AppointmentViewAdmin() {
                   onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                 />
 
-                <label>Patient ID:</label>
-                <input
-                  type="number"
-                  placeholder="Enter patient ID"
+                <label>Select Patient:</label>
+                <select
                   value={formData.patientId}
                   onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
-                />
+                >
+                  <option value="">-- Choose a Patient --</option>
+                  {patients.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.firstName} {p.lastName} (ID: {p.id})
+                    </option>
+                  ))}
+                </select>
 
-                <label>Doctor ID:</label>
-                <input
-                  type="number"
-                  placeholder="Enter doctor ID"
+                <label>Select Doctor:</label>
+                <select
                   value={formData.doctorId}
                   onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
-                />
+                >
+                  <option value="">-- Choose a Doctor --</option>
+                  {doctors.map(d => (
+                    <option key={d.id} value={d.id}>
+                      Dr. {d.firstName} {d.lastName} (ID: {d.id})
+                    </option>
+                  ))}
+                </select>
 
                 <button onClick={handleAddAppointment} disabled={isCreating}>
                   {isCreating ? "Creating..." : "Create Appointment"}
@@ -314,7 +381,7 @@ function AppointmentViewAdmin() {
           <div className="popup-overlay">
             <div className="popup">
               <button className="close-btn" onClick={closeEdit}>X</button>
-              <h2>Edit Appointment #{editingAppointment.id || editingAppointment._id}</h2>
+              <h2>Edit Appointment with {editingAppointment.patientName}</h2>
 
               <div className="form-section">
                 <label>Date:</label>
@@ -338,19 +405,31 @@ function AppointmentViewAdmin() {
                   onChange={(e) => setEditFormData({ ...editFormData, endTime: e.target.value })}
                 />
 
-                <label>Patient ID:</label>
-                <input
-                  type="number"
+                <label>Select Patient:</label>
+                <select
                   value={editFormData.patientId}
                   onChange={(e) => setEditFormData({ ...editFormData, patientId: e.target.value })}
-                />
+                >
+                  <option value="">-- Choose a Patient --</option>
+                  {patients.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.firstName} {p.lastName} (ID: {p.id})
+                    </option>
+                  ))}
+                </select>
 
-                <label>Doctor ID:</label>
-                <input
-                  type="number"
+                <label>Select Doctor:</label>
+                <select
                   value={editFormData.doctorId}
                   onChange={(e) => setEditFormData({ ...editFormData, doctorId: e.target.value })}
-                />
+                >
+                  <option value="">-- Choose a Doctor --</option>
+                  {doctors.map(d => (
+                    <option key={d.id} value={d.id}>
+                      Dr. {d.firstName} {d.lastName} (ID: {d.id})
+                    </option>
+                  ))}
+                </select>
 
                 <div style={{ marginTop: 12 }}>
                   <button onClick={saveEdit} style={{ marginRight: 8 }}>Save</button>
@@ -387,7 +466,7 @@ function AppointmentViewAdmin() {
                     >
                       Edit</button>
                     <button 
-                      onClick={() => handleDeleteAppointment(apt.id || apt._id)}
+                      onClick={() => openDeleteConfirmation(apt)}
                       style={{ backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
                     >
                       Delete

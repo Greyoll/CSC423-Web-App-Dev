@@ -1,19 +1,9 @@
 /* =================================
    GLOBAL STYLES
    ================================= */
-* {
-  font-family: Arial, sans-serif;
-}
-
-:root {
-  color-scheme: light;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #fff;
-}
+* { font-family: Arial, sans-serif; }
+:root { color-scheme: light; }
+body { margin: 0; padding: 0; background-color: #fff; }
 
 /* =================================
    HEADER & NAVIGATION
@@ -23,7 +13,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 4rem;
-  color: #000000;
+  color: #000;
 }
 
 .logo {
@@ -31,11 +21,8 @@ header {
   font-size: 1.8rem;
   font-weight: bold;
 }
-
-.logo span {
-  font-family: cursive;
-  font-size: 1.4rem;
-}
+.logo span { font-family: cursive; font-size: 1.4rem; }
+.logo img { max-width: 100px; height: auto; }
 
 nav ul {
   list-style: none;
@@ -44,95 +31,51 @@ nav ul {
   margin: 0;
   padding: 0;
 }
-
-nav a {
-  text-decoration: none;
-  color: black;
-  font-weight: 500;
-}
+nav a { text-decoration: none; color: #000; font-weight: 500; }
 
 .login-btn {
-  background-color: black;
-  color: rgb(255, 255, 255) !important;
+  background-color: #000;
+  color: #fff !important;
   padding: 0.5rem 1.2rem;
   border-radius: 6px;
 }
-
-.login-btn:hover {
-  opacity: 0.85;
-}
+.login-btn:hover { opacity: 0.85; }
 
 /* =================================
    HOME PAGE - HERO SECTION
    ================================= */
-.container {
-  position: relative;
-  text-align: center;
-  color: white;
-}
-
-.top-left {
-  position: absolute;
-  top: 8px;
-  left: 16px;
-}
-
+.container { position: relative; text-align: center; color: #fff; }
+.top-left { position: absolute; top: 8px; left: 16px; }
 .top-right {
   position: absolute;
   top: 8px;
   right: 130px;
   display: grid;
-  grid-template-columns: 25% 25% 25% 25%;
+  grid-template-columns: repeat(4, 25%);
   column-gap: 10%;
 }
-
 .centered {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
-
-.header-img {
-  width: 100%;   
-  height: auto;
-  filter: blur(1px);
-}
-
-.logo img {
-  max-width: 100px; 
-  height: auto;
-}
-
-.about-img {
-  max-width: 200px; 
-  height: auto;
-}
+.header-img { width: 100%; height: auto; filter: blur(1px); }
+.about-img { max-width: 200px; height: auto; }
 
 /* =================================
    BUTTONS
    ================================= */
-.button {
-  background-color: #000000;
-  color: rgb(255, 255, 255);
-  padding: 10px 20px; 
-  border: none;
+.button, .headerButton {
+  padding: 10px 20px;
   border-radius: 5px;
-  text-align: center; 
-  text-decoration: none; 
+  text-align: center;
+  text-decoration: none;
   display: inline-block;
   cursor: pointer;
 }
-
-.headerButton {
-  border: 2px solid #FFFFFF;
-  padding: 10px 20px; 
-  border-radius: 5px;
-  text-align: center; 
-  text-decoration: none; 
-  display: inline-block;
-  cursor: pointer;
-}
+.button { background-color: #000; color: #fff; border: none; }
+.headerButton { border: 2px solid #fff; }
 
 /* =================================
    LOGIN PAGE
@@ -151,24 +94,9 @@ nav a {
   flex-direction: column;
   max-width: 500px;
 }
-
-.login-section h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #000000;
-}
-
-.login-section p {
-  margin: 0.5rem 0 1.5rem;
-  color: #000000;
-}
-
-.login-section label {
-  margin-top: 1rem;
-  display: block;
-  color: #000000;
-}
-
+.login-section h1 { font-size: 2rem; font-weight: bold; color: #000; }
+.login-section p { margin: 0.5rem 0 1.5rem; color: #000; }
+.login-section label { margin-top: 1rem; display: block; color: #000; }
 .login-section select,
 .login-section input {
   width: 100%;
@@ -178,16 +106,14 @@ nav a {
   border-radius: 4px;
   background-color: #f2f2f2;
   margin-top: 0.3rem;
-  color: #000000;
+  color: #000;
 }
-
 .login-section input:focus,
 .login-section select:focus {
   outline: none;
   border-color: #888;
   background-color: #fff;
 }
-
 .login-section button {
   margin-top: 1.5rem;
   width: 150px;
@@ -198,10 +124,7 @@ nav a {
   cursor: pointer;
   font-size: 1rem;
 }
-
-.login-section button:hover {
-  background: #bbb;
-}
+.login-section button:hover { background: #bbb; }
 
 .image-section {
   flex: 1;
@@ -209,7 +132,6 @@ nav a {
   justify-content: center;
   align-items: center;
 }
-
 .image-section img {
   width: 100%;
   max-width: 500px;
@@ -227,105 +149,43 @@ nav a {
   gap: 20px;
   padding: 3rem 0;
 }
-
-.left-about-us-text {
+.left-about-us-text, .right-about-us-text {
   text-align: left;
-  float: left;
-  margin-left: 15px;
   width: 40%;
   text-wrap: balance;
 }
-
-.right-img {
-  float: right;
-  margin-right: 15px;
-}
-
-.right-about-us-text {
-  text-align: left;
-  float: right;
-  margin-left: 150px;
-  width: 40%;
-  text-wrap: balance;
-}
-
-.left-img {
-  float: left;
-  margin-left: 40px;
-}
+.left-about-us-text { float: left; margin-left: 15px; }
+.right-about-us-text { float: right; margin-left: 150px; }
+.right-img { float: right; margin-right: 15px; }
+.left-img { float: left; margin-left: 40px; }
 
 /* =================================
-   STEPS SECTION
+   STEPS & FOOTER SECTIONS
    ================================= */
-.steps-section {
-  padding: 1rem 0;
-  display: flex;
-}
-
-.steps-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-.steps-grid {
+.steps-section, .steps-container, .footer-container { padding: 1rem 0; }
+.steps-container, .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+.steps-grid, .footer-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
   margin-top: 3rem;
 }
-
-.step-card {
-  text-align: center;
-  padding: 2rem;
-}
-
-.step-card h3 {
-  font-size: 1.3rem;
-  margin-bottom: 1rem;
-  color: #2c3e50;
-}
-
-.step-card p {
-  color: #666;
-  font-size: 0.95rem;
-}
-
-/* =================================
-   FOOTER SECTION
-   ================================= */
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-top: 3rem;
-}
-
-.footer-card {
-  text-align: left;
-  padding: 2rem;
-}
+.step-card, .footer-card { text-align: center; padding: 2rem; }
+.footer-card { text-align: left; }
+.step-card h3 { font-size: 1.3rem; margin-bottom: 1rem; color: #2c3e50; }
+.step-card p { color: #666; font-size: 0.95rem; }
 
 /* =================================
    DASHBOARD LAYOUT
    ================================= */
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-}
+.dashboard-container { display: flex; min-height: 100vh; }
 
 /* =================================
    SIDEBAR
    ================================= */
 .sidebar {
   position: fixed;
-  background-color: #000000;
+  background-color: #000;
   height: 100vh;
   width: 240px;
   padding: 2rem 1rem;
@@ -333,143 +193,84 @@ nav a {
   flex-direction: column;
   justify-content: space-between;
 }
-
 .sidebar .logo {
   text-align: center;
   width: 100%;
   font-family: Arial, sans-serif;
   font-size: 1rem;
 }
-
-.sidebar .logo img {
-  width: 120px;
-  height: auto;
-}
-
+.sidebar .logo img { width: 120px; height: auto; }
 .nav-menu {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-
-.nav-item {
-  color: #ffffff;
+.nav-item, .sidebar .nav-item {
+  color: #fff;
   padding: 1rem 0;
   font-size: 0.95rem;
-}
-
-.settings a {
-  color: #ffffff;
-  font-size: 0.85rem;
-  display: block;
-  margin-top: auto;
-}
-
-/* =================================
-   MAIN CONTENT (DASHBOARD)
-   ================================= */
-.main-content {
-  flex: 1;
-  padding: 2rem;
-  margin-left: 280px;
-}
-
-.main-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* =================================
-   APPOINTMENT SECTIONS
-   ================================= */
-.appointments-section {
-  margin-bottom: 2rem;
-  background-color: #F0F0F0;
-  color:#000;
-  padding: 1.5rem;
-  width: 90%;
-  border-radius: 12px;
-}
-
-/* .appointment-cards {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-} */
-
-.appointment-cards {
-  flex: 1;           /* makes all cards grow equally */
-  min-width: 250px;  /* adjusts how wide each card can be */
-  padding: 1rem;
-  border-radius: 8px;
-  display: flex;
-  gap: 1rem;
-}
-
-.card {
-  background-color: #ffffff;
-  padding: 1rem;
-  border-radius: 8px;
-  flex: 1 1 250px;
-  box-sizing: border-box;
-}
-
-.card h1 {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-}
-
-.card h2 {
-  margin-bottom: 0.25rem;
-  font-size: 0.95rem;
-  color: #555;
-}
-
-.card p {
-  color: #888;
-  font-size: 0.85rem;
-}
-
-/* Make sidebar buttons look like sidebar links */
-.sidebar .nav-item {
   background: none;
   border: none;
-  color: #ffffff;
-  font-size: 0.95rem;
   text-align: left;
-  padding: 1rem 0;
   width: 100%;
   cursor: pointer;
 }
-
-.sidebar .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
+.sidebar .nav-item:hover { background-color: rgba(255, 255, 255, 0.1); }
+.settings a { color: #fff; font-size: 0.85rem; display: block; margin-top: auto; }
 .sidebar .settings button.nav-item {
   background: none;
   border: none;
-  color: #ffffff;
+  color: #fff;
   font-size: 0.85rem;
   display: block;
   margin-top: 1rem;
   text-align: left;
   cursor: pointer;
 }
+.sidebar .settings button.nav-item:hover { background-color: rgba(255, 255, 255, 0.1); }
 
-.sidebar .settings button.nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+/* =================================
+   MAIN CONTENT
+   ================================= */
+.main-content { flex: 1; padding: 2rem; margin-left: 280px; }
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
+.user-info { display: flex; align-items: center; gap: 0.5rem; }
+
+/* =================================
+   APPOINTMENT SECTIONS
+   ================================= */
+.appointments-section {
+  margin-bottom: 2rem;
+  background-color: #f0f0f0;
+  color: #000;
+  padding: 1.5rem;
+  width: 90%;
+  border-radius: 12px;
+}
+.appointment-cards {
+  flex: 1;
+  min-width: 250px;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  gap: 1rem;
+}
+.card {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  flex: 1 1 250px;
+  box-sizing: border-box;
+}
+.card h1 { display: block; margin-bottom: 0.5rem; font-size: 1.1rem; }
+.card h2 { margin-bottom: 0.25rem; font-size: 0.95rem; color: #555; }
+.card p { color: #888; font-size: 0.85rem; }
 
 /* =================================
    POPUP/MODAL STYLES
@@ -486,9 +287,8 @@ nav a {
   align-items: center;
   z-index: 1000;
 }
-
 .popup {
-  background-color: white;
+  background-color: #fff;
   padding: 2rem;
   border-radius: 8px;
   max-width: 90%;
@@ -497,13 +297,12 @@ nav a {
   position: relative;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
 .close-btn {
   position: absolute;
   top: 1rem;
   right: 1rem;
   background: #d32f2f;
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 4px;
   padding: 0.5rem 1rem;
@@ -511,15 +310,9 @@ nav a {
   font-size: 1rem;
   font-weight: bold;
 }
+.close-btn:hover { background: #b71c1c; }
 
-.close-btn:hover {
-  background: #b71c1c;
-}
-
-.form-section {
-  margin-bottom: 2rem;
-}
-
+.form-section { margin-bottom: 2rem; }
 .form-section input,
 .form-section select {
   width: 100%;
@@ -529,61 +322,32 @@ nav a {
   border-radius: 4px;
   font-size: 1rem;
 }
-
 .form-section input:focus,
 .form-section select:focus {
   outline: none;
   border-color: #000;
 }
-
 .form-section button {
   width: 100%;
   padding: 0.75rem;
   background-color: #000;
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
   margin-top: 0.5rem;
 }
+.form-section button:hover { background-color: #333; }
+.form-section button:disabled { background-color: #ccc; cursor: not-allowed; }
+.form-section label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; }
 
-.form-section button:hover {
-  background-color: #333;
-}
-
-.form-section button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.table-section {
-  margin-top: 2rem;
-  overflow-x: auto;
-}
-
-.table-section table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: white;
-}
-
+.table-section { margin-top: 2rem; overflow-x: auto; }
+.table-section table { width: 100%; border-collapse: collapse; background-color: #fff; }
 .table-section th,
-.table-section td {
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-.table-section th {
-  background-color: #f5f5f5;
-  font-weight: bold;
-}
-
-.table-section tr:hover {
-  background-color: #f9f9f9;
-}
-
+.table-section td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #ddd; }
+.table-section th { background-color: #f5f5f5; font-weight: bold; }
+.table-section tr:hover { background-color: #f9f9f9; }
 .table-section button {
   padding: 0.5rem 1rem;
   margin-right: 0.5rem;
@@ -592,82 +356,43 @@ nav a {
   cursor: pointer;
   font-size: 0.9rem;
 }
-
-.table-section button:first-of-type {
-  background-color: #4caf50;
-  color: white;
-}
-
-.table-section button:first-of-type:hover {
-  background-color: #45a049;
-}
-
-.table-section button:last-of-type {
-  background-color: #d32f2f;
-  color: white;
-}
-
-.table-section button:last-of-type:hover {
-  background-color: #b71c1c;
-}
-
-.form-section label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #333;
-}
+.table-section button:first-of-type { background-color: #4caf50; color: #fff; }
+.table-section button:first-of-type:hover { background-color: #45a049; }
+.table-section button:last-of-type { background-color: #d32f2f; color: #fff; }
+.table-section button:last-of-type:hover { background-color: #b71c1c; }
 
 /* =================================
-   SETTINGS PAGE STYLES
+   SETTINGS PAGE
    ================================= */
 .user-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   padding: 1.5rem;
-  background-color: #ffffff;
+  background-color: #fff;
   border-radius: 8px;
 }
-
-.info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.info-item label {
-  font-weight: 600;
-  color: #555;
-  font-size: 0.9rem;
-}
-
-.info-item p {
-  color: #000;
-  font-size: 1rem;
-  margin: 0;
-}
-
+.info-item { display: flex; flex-direction: column; gap: 0.5rem; }
+.info-item label { font-weight: 600; color: #555; font-size: 0.9rem; }
+.info-item p { color: #000; font-size: 1rem; margin: 0; }
 .role-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   background-color: #000 !important;
-  color: white !important;
+  color: #fff !important;
   border-radius: 4px;
   font-size: 0.9rem;
   text-transform: capitalize;
   width: fit-content;
 }
-
 .settings-group {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   padding: 1.5rem;
-  background-color: #ffffff;
+  background-color: #fff;
   border-radius: 8px;
 }
-
 .setting-item {
   display: flex;
   justify-content: space-between;
@@ -676,19 +401,8 @@ nav a {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
 }
-
-.setting-info h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
-  color: #000;
-}
-
-.setting-info p {
-  margin: 0;
-  color: #666;
-  font-size: 0.9rem;
-}
-
+.setting-info h3 { margin: 0 0 0.5rem; font-size: 1.1rem; color: #000; }
+.setting-info p { margin: 0; color: #666; font-size: 0.9rem; }
 .settings-button {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -698,41 +412,16 @@ nav a {
   transition: all 0.3s ease;
   font-weight: 500;
 }
-
-.settings-button.secondary {
-  background-color: #f0f0f0;
-  color: #000;
-}
-
-.settings-button.secondary:hover {
-  background-color: #e0e0e0;
-}
-
-.settings-button.danger {
-  background-color: #d32f2f;
-  color: white;
-}
-
-.settings-button.danger:hover {
-  background-color: #b71c1c;
-}
+.settings-button.secondary { background-color: #f0f0f0; color: #000; }
+.settings-button.secondary:hover { background-color: #e0e0e0; }
+.settings-button.danger { background-color: #d32f2f; color: #fff; }
+.settings-button.danger:hover { background-color: #b71c1c; }
 
 /* =================================
    TOGGLE SWITCH
    ================================= */
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
+.toggle-switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
 .toggle-slider {
   position: absolute;
   cursor: pointer;
@@ -744,7 +433,6 @@ nav a {
   transition: 0.4s;
   border-radius: 34px;
 }
-
 .toggle-slider:before {
   position: absolute;
   content: "";
@@ -752,187 +440,63 @@ nav a {
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: white;
+  background-color: #fff;
   transition: 0.4s;
   border-radius: 50%;
 }
-
-.toggle-switch input:checked + .toggle-slider {
-  background-color: #000;
-}
-
-.toggle-switch input:checked + .toggle-slider:before {
-  transform: translateX(26px);
-}
+.toggle-switch input:checked + .toggle-slider { background-color: #000; }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(26px); }
 
 /* =================================
-   DARK MODE STYLES
+   DARK MODE
    ================================= */
-body.dark-mode {
-  background-color: #1a1a1a;
-  color: #e0e0e0;
-}
-
-.dark-mode header {
-  background-color: #1a1a1a;
-  color: #e0e0e0;
-}
-
-.dark-mode nav a {
-  color: #e0e0e0;
-}
-
-.dark-mode .login-btn {
-  background-color: #444444;
-  color: #000000;
-}
-
-.dark-mode .login-btn:hover {
-  background-color: #555555;
-}
-
-.dark-mode .main-container {
-  background-color: #1a1a1a;
-}
-
-.dark-mode .login-section {
-  background-color: #1a1a1a;
-}
-
+body.dark-mode { background-color: #1a1a1a; color: #e0e0e0; }
+.dark-mode header { background-color: #1a1a1a; color: #e0e0e0; }
+.dark-mode nav a { color: #e0e0e0; }
+.dark-mode .login-btn { background-color: #444; color: #000; }
+.dark-mode .login-btn:hover { background-color: #555; }
+.dark-mode .main-container,
+.dark-mode .login-section { background-color: #1a1a1a; }
 .dark-mode .login-section h1,
 .dark-mode .login-section p,
-.dark-mode .login-section label {
-  color: #e0e0e0;
-}
-
+.dark-mode .login-section label { color: #e0e0e0; }
 .dark-mode .login-section input,
 .dark-mode .login-section select {
   background-color: #2a2a2a;
   color: #e0e0e0;
   border-color: #444;
 }
-
-.dark-mode .login-section button {
-  background: #444;
-  color: #e0e0e0;
-}
-
-.dark-mode .login-section button:hover {
-  background: #555;
-}
-
-.dark-mode .main-content {
-  background-color: #1a1a1a;
-  color: #e0e0e0;
-}
-
-.dark-mode .main-header h1 {
-  color: #e0e0e0;
-}
-
-.dark-mode .user-info span {
-  color: #e0e0e0;
-}
-
-.dark-mode .appointments-section {
-  background-color: #2a2a2a;
-}
-
-.dark-mode .appointments-section h2 {
-  color: #e0e0e0;
-}
-
-.dark-mode .card {
-  background-color: #333;
-  color: #e0e0e0;
-}
-
+.dark-mode .login-section button { background: #444; color: #e0e0e0; }
+.dark-mode .login-section button:hover { background: #555; }
+.dark-mode .main-content { background-color: #1a1a1a; color: #e0e0e0; }
+.dark-mode .main-header h1,
+.dark-mode .user-info span { color: #e0e0e0; }
+.dark-mode .appointments-section { background-color: #2a2a2a; }
+.dark-mode .appointments-section h2 { color: #e0e0e0; }
+.dark-mode .card { background-color: #333; color: #e0e0e0; }
 .dark-mode .card h1,
-.dark-mode .card h2 {
-  color: #e0e0e0;
-}
-
-.dark-mode .card p {
-  color: #b0b0b0;
-}
-
-.dark-mode .user-info-grid {
-  background-color: #2a2a2a;
-}
-
-.dark-mode .info-item label {
-  color: #b0b0b0;
-}
-
-.dark-mode .info-item p {
-  color: #e0e0e0;
-}
-
-.dark-mode .role-badge {
-  background-color: #e0e0e0;
-  color: #000;
-}
-
-.dark-mode .settings-group {
-  background-color: #2a2a2a;
-}
-
-.dark-mode .setting-item {
-  background-color: #333;
-  border-color: #444;
-}
-
-.dark-mode .setting-info h3 {
-  color: #e0e0e0;
-}
-
-.dark-mode .setting-info p {
-  color: #b0b0b0;
-}
-
-.dark-mode .settings-button.secondary {
-  background-color: #444;
-  color: #e0e0e0;
-}
-
-.dark-mode .settings-button.secondary:hover {
-  background-color: #555;
-}
-
-.dark-mode .popup {
-  background-color: #2a2a2a;
-  color: #e0e0e0;
-}
-
-.dark-mode .popup h2 {
-  color: #e0e0e0;
-}
-
+.dark-mode .card h2 { color: #e0e0e0; }
+.dark-mode .card p { color: #b0b0b0; }
+.dark-mode .user-info-grid,
+.dark-mode .settings-group { background-color: #2a2a2a; }
+.dark-mode .info-item label { color: #b0b0b0; }
+.dark-mode .info-item p { color: #e0e0e0; }
+.dark-mode .role-badge { background-color: #e0e0e0; color: #000; }
+.dark-mode .setting-item { background-color: #333; border-color: #444; }
+.dark-mode .setting-info h3 { color: #e0e0e0; }
+.dark-mode .setting-info p { color: #b0b0b0; }
+.dark-mode .settings-button.secondary { background-color: #444; color: #e0e0e0; }
+.dark-mode .settings-button.secondary:hover { background-color: #555; }
+.dark-mode .popup { background-color: #2a2a2a; color: #e0e0e0; }
+.dark-mode .popup h2 { color: #e0e0e0; }
 .dark-mode .form-section input,
 .dark-mode .form-section select {
   background-color: #333;
   color: #e0e0e0;
   border-color: #444;
 }
-
-.dark-mode .form-section label {
-  color: #b0b0b0;
-}
-
-.dark-mode .table-section table {
-  background-color: #2a2a2a;
-}
-
-.dark-mode .table-section th {
-  background-color: #333;
-  color: #e0e0e0;
-}
-
-.dark-mode .table-section td {
-  color: #e0e0e0;
-  border-color: #444;
-}
-
-.dark-mode .table-section tr:hover {
-  background-color: #333;
-}
+.dark-mode .form-section label { color: #b0b0b0; }
+.dark-mode .table-section table { background-color: #2a2a2a; }
+.dark-mode .table-section th { background-color: #333; color: #e0e0e0; }
+.dark-mode .table-section td { color: #e0e0e0; border-color: #444; }
+.dark-mode .table-section tr:hover { background-color: #333; }

@@ -1,3 +1,4 @@
+// Automatic vite install do not touch
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
