@@ -194,14 +194,13 @@ nav a { text-decoration: none; color: #000; font-weight: 500; }
 }
 
 .stat-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: #000;
+  background-color: #dddddd;
+  box-shadow: 0 4px 8px rgba(0, 255, 13, 0.1);
   transform: translateY(-2px);
 }
 
-.stat-icon {
-  font-size: 2rem;
-  opacity: 0.8;
-}
+.stat-icon img { width: 35px; }
 
 .stat-content h3 {
   font-size: 1.8rem;
@@ -217,9 +216,19 @@ nav a { text-decoration: none; color: #000; font-weight: 500; }
 }
 
 .dark-mode .stat-card {
+  color: #fff;
   background-color: #2a2a2a;
   border-color: #444;
 }
+
+.dark-mode .stat-card:hover {
+  color: #fff;
+  background-color: #3a3a3a;
+  box-shadow: 0 4px 8px rgba(3, 0, 38, 0.1);
+  transform: translateY(-2px);
+}
+
+.dark-mode .stat-icon img { width: 35px; filter: invert(1); }
 
 .dark-mode .stat-content h3 {
   color: #e0e0e0;
@@ -320,6 +329,7 @@ nav a { text-decoration: none; color: #000; font-weight: 500; }
 .card h1 { display: block; margin-bottom: 0.5rem; font-size: 1.1rem; }
 .card h2 { margin-bottom: 0.25rem; font-size: 0.95rem; color: #555; }
 .card p { color: #888; font-size: 0.85rem; }
+.card img { width: 18px; }
 
 /* =================================
    POPUP/MODAL STYLES
@@ -526,6 +536,7 @@ body.dark-mode { background-color: #1a1a1a; color: #e0e0e0; }
 .dark-mode .card h1,
 .dark-mode .card h2 { color: #e0e0e0; }
 .dark-mode .card p { color: #b0b0b0; }
+.dark-mode .card img { width: 18px; filter: invert(1); }
 .dark-mode .user-info-grid,
 .dark-mode .settings-group { background-color: #2a2a2a; }
 .dark-mode .info-item label { color: #b0b0b0; }

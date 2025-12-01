@@ -86,24 +86,17 @@ function DashboardDoctor() {
         {/* Quick Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
           <div className="stat-card">
-            <div className="stat-icon">📅</div>
+            <div className="stat-icon"><img src="/Images/calendar-days.png"/></div>
             <div className="stat-content">
               <h3>{todayAppointments.length}</h3>
               <p>Today's Appointments</p>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">👥</div>
+            <div className="stat-icon"><img src="/Images/users.png"/></div>
             <div className="stat-content">
               <h3>{appointments.length}</h3>
               <p>Total Patients</p>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">💬</div>
-            <div className="stat-content">
-              <h3>3</h3>
-              <p>New Messages</p>
             </div>
           </div>
         </div>
@@ -124,17 +117,17 @@ function DashboardDoctor() {
             {loading ? (
               <p>Loading appointments...</p>
             ) : todayAppointments.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-state-icon">📋</div>
+              <div className="card">
+                <div className="empty-state-icon"><img src="/Images/clipboard-list.png"/></div>
                 <h3>No Appointments Today</h3>
                 <p>You don't have any appointments scheduled for today.</p>
               </div>
             ) : (
               todayAppointments.map((apt) => (
                 <div className="card" key={apt._id || apt.id}>
-                  <h1>👤 {apt.patientName || 'Unknown Patient'}</h1>
-                  <h2>📅 {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
-                  <p className="time-badge">🕐 {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
+                  <h1><img src="/Images/user.png"/> {apt.patientName || 'Unknown Patient'}</h1>
+                  <h2><img src="/Images/clipboard-list.png"/> {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
+                  <p className="time-badge"><img src="/Images/clock.png"/> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
                 </div>
               ))
             )}

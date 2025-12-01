@@ -81,14 +81,14 @@ function DashboardPatient() {
         {/* Quick Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
           <div className="stat-card">
-            <div className="stat-icon">📅</div>
+            <div className="stat-icon"><img src="/Images/calendar-days.png"/></div>
             <div className="stat-content">
               <h3>{upcomingAppointments.length}</h3>
               <p>Upcoming Appointments</p>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">📋</div>
+            <div className="stat-icon"><img src="/Images/clipboard-list.png"/></div>
             <div className="stat-content">
               <h3>{appointments.length}</h3>
               <p>Total Appointments</p>
@@ -113,7 +113,7 @@ function DashboardPatient() {
               <p>Loading appointments...</p>
             ) : upcomingAppointments.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-icon">📅</div>
+                <div className="empty-state-icon"></div>
                 <h3>No Upcoming Appointments</h3>
                 <p>You don't have any appointments scheduled.</p>
               </div>
@@ -121,8 +121,8 @@ function DashboardPatient() {
               upcomingAppointments.slice(0, 3).map((apt) => (
                 <div className="card" key={apt.id || apt._id}>
                   <h1>Dr. {apt.doctorName || 'Unknown'}</h1>
-                  <h2>📅 {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
-                  <p className="time-badge">🕐 {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
+                  <h2><img src="/Images/calendar-days.png"/> {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
+                  <p className="time-badge"><img src="/Images/clock.png"/> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
                 </div>
               ))
             )}

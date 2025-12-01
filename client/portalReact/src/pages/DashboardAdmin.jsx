@@ -71,21 +71,21 @@ function DashboardAdmin() {
         {/* Quick Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
           <div className="stat-card">
-            <div className="stat-icon">📊</div>
+            <div className="stat-icon"><img src="/Images/chart-column.png"/></div>
             <div className="stat-content">
               <h3>{appointments.length}</h3>
               <p>Total Appointments</p>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">👥</div>
+            <div className="stat-icon"><img src="/Images/users.png"/></div>
             <div className="stat-content">
               <h3>24</h3>
               <p>Active Users</p>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">👨‍⚕️</div>
+            <div className="stat-icon"><img src="/Images/stethoscope.png"/></div>
             <div className="stat-content">
               <h3>8</h3>
               <p>Doctors</p>
@@ -110,16 +110,16 @@ function DashboardAdmin() {
               <p>Loading appointments...</p>
             ) : appointments.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-icon">📊</div>
+                <div className="empty-state-icon"><img src="/Images/chart-column.png"/></div>
                 <h3>No Appointments</h3>
                 <p>There are no appointments in the system.</p>
               </div>
             ) : (
               appointments.slice(0, 3).map((apt) => (
                 <div className="card" key={apt._id || apt.id}>
-                  <h1>👤 {apt.patientName} with Dr. {apt.doctorName}</h1>
-                  <h2>📅 {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
-                  <p className="time-badge">🕐 {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
+                  <h1><img src="/Images/user.png"/> {apt.patientName} with Dr. {apt.doctorName}</h1>
+                  <h2><img src="/Images/calendar-days.png"/> {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
+                  <p className="time-badge"><img src="/Images/clock.png"/> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
                 </div>
               ))
             )}
@@ -129,15 +129,15 @@ function DashboardAdmin() {
         <section className="appointments-section">
           <h2>Quick Actions</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-            <Link to="/admin/users" className="action-card">
-              <span className="action-icon">👥</span>
+            <Link to="/admin/users" className="stat-card">
+              <span className="stat-icon"><img src="/Images/users.png"/></span>
               <div>
                 <h3>User Management</h3>
                 <p>Manage system users</p>
               </div>
             </Link>
-            <Link to="/admin/appointments" className="action-card">
-              <span className="action-icon">📅</span>
+            <Link to="/admin/appointments" className="stat-card">
+              <span className="stat-icon"><img src="/Images/calendar-days.png"/></span>
               <div>
                 <h3>Appointments</h3>
                 <p>View and manage appointments</p>
