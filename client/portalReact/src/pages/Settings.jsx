@@ -9,6 +9,13 @@ function Settings() {
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showChangeModal, setShowChangeModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isChanging, setIsChanging] = useState(false);
+  const [changeError, setChangeError] = useState(null);
+  const [changeSuccess, setChangeSuccess] = useState(null);
   const { userRole } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
   const handleLogout = useHandleLogout();
@@ -102,6 +109,64 @@ function Settings() {
     return null;
   };
 
+  const handleChangePassword = async (e) => {
+    e && e.preventDefault && e.preventDefault();
+    setChangeError(null);
+    setChangeSuccess(null);
+
+    if (!newPassword) {
+      setChangeError('Please enter a new password');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setChangeError('New passwords do not match');
+      return;
+    }
+
+    try {
+      setIsChanging(true);
+      const token = localStorage.getItem('token');
+      if (!token || !userInfo) {
+        setChangeError('Missing authentication or user info');
+        return;
+      }
+
+      // Use Mongo _id if present, otherwise numeric id
+      const idParam = userInfo._id || userInfo.id;
+      const res = await fetch(`http://localhost:3000/api/users/${idParam}/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setChangeError(data.error || data.message || 'Failed to change password');
+        return;
+      }
+
+      setChangeSuccess('Password changed successfully');
+      // update lastPasswordChange in UI
+      setUserInfo(prev => ({ ...prev, lastPasswordChange: new Date().toISOString() }));
+      // clear fields after short delay and close modal
+      setTimeout(() => {
+        setShowChangeModal(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setChangeSuccess(null);
+      }, 900);
+    } catch (err) {
+      console.error('Error changing password:', err);
+      setChangeError(err.message || 'Network error');
+    } finally {
+      setIsChanging(false);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <Sidebar role={userRole} />
@@ -177,7 +242,12 @@ function Settings() {
             <section className="appointments-section">
               <h2>Account Actions</h2>
               <div className="settings-group">
-                <button className="settings-button secondary">Change Password</button>
+                <button
+                  className="settings-button secondary"
+                  onClick={(e) => { e.preventDefault(); setShowChangeModal(true); }}
+                >
+                  Change Password
+                </button>
                 <button 
                   className="settings-button danger"
                   onClick={(e) => { e.preventDefault(); handleLogout(); }}
@@ -186,6 +256,44 @@ function Settings() {
                 </button>
               </div>
             </section>
+
+            {/* Change Password Modal */}
+            {showChangeModal && (
+              <div className="popup-overlay">
+                <div className="popup">
+                  <button className="close-btn" onClick={() => setShowChangeModal(false)}>X</button>
+                  <h2>Change Password</h2>
+                  <div className="form-section">
+                    <input
+                      type="password"
+                      placeholder="Current Password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                    />
+                    <input
+                      type="password"
+                      placeholder="New Password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                    <input
+                      type="password"
+                      placeholder="Confirm New Password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                    {changeError && <p style={{ color: 'red' }}>{changeError}</p>}
+                    {changeSuccess && <p style={{ color: 'green' }}>{changeSuccess}</p>}
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button onClick={handleChangePassword} disabled={isChanging}>
+                        {isChanging ? 'Changing...' : 'Save'}
+                      </button>
+                      <button onClick={() => setShowChangeModal(false)}>Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
       </main>

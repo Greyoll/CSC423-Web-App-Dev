@@ -108,6 +108,53 @@ module.exports.updateUser = async (req, res) => {
     }
 };
 
+module.exports.changePassword = async (req, res) => {
+    try {
+        const requester = req.user; 
+        const paramId = req.params.id;
+
+        let targetUser = await User.findById(paramId).catch(() => null);
+        if (!targetUser) {
+            targetUser = await User.findOne({ id: parseInt(paramId) });
+        }
+
+        if (!targetUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        if (requester.role !== 'admin') {
+            if (parseInt(requester.id) !== parseInt(targetUser.id)) {
+                return res.status(403).json({ error: "Forbidden: cannot change another user's password" });
+            }
+        }
+
+        const { currentPassword, newPassword } = req.body;
+        if (!newPassword) {
+            return res.status(400).json({ error: "New password is required" });
+        }
+
+        if (requester.role !== 'admin') {
+            if (!currentPassword) {
+                return res.status(400).json({ error: "Current password is required" });
+            }
+            const ok = await bcrypt.compare(currentPassword, targetUser.password);
+            if (!ok) {
+                return res.status(401).json({ error: "Current password is incorrect" });
+            }
+        }
+
+        const hash = await bcrypt.hash(newPassword, 10);
+        targetUser.password = hash;
+        targetUser.lastPasswordChange = new Date();
+        await targetUser.save();
+
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (err) {
+        console.error("Error changing password:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 // Delete user
 module.exports.deleteUser = async (req, res) => {
     try {
