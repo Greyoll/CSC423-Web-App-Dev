@@ -210,6 +210,12 @@ function AppointmentViewAdmin() {
       };
 
       const res = await fetch(`http://localhost:3000/api/appointments/${appointmentIdParam}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {

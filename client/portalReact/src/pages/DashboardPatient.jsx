@@ -65,7 +65,7 @@ function DashboardPatient() {
               appointments.map((apt) => (
                 <div className="card" key={apt._id || apt.id}>
                   <h1>Appointment #{apt.id}</h1>
-                  <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { timeZone: 'UTC' }) : '—'}</h2>
                   <p>{apt.startTime} - {apt.endTime}</p>
                 </div>
               ))
