@@ -93,7 +93,7 @@ function Login() {
       <main className="main-container">
         <div className="login-section">
           <h1>Valdez M.D Family Medicine</h1>
-          <p>Login:</p>
+
           <form id="loginForm" onSubmit={handleSubmit}>
             {error && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <label htmlFor="username">Username:</label>

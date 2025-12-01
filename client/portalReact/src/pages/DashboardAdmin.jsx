@@ -7,89 +7,148 @@ function DashboardAdmin() {
   const [userName, setUserName] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [loadingAppts, setLoadingAppts] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
   const handleLogout = useHandleLogout();
 
+  // Helper function to convert 24hr to 12hr format
+  const formatTime = (time24) => {
+    if (!time24) return '—';
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      const payload = parseJwt(token);
+      if (!payload) return;
+
+      const userId = payload.id;
+
+      setUserName(`${payload.firstName || ""} ${payload.lastName || ""}`.trim());
+
       try {
-        const token = localStorage.getItem("token");
-        const payload = parseJwt(token);
-        if (!payload) {
-          console.error("Invalid token");
-          return;
-        }
-        const userId = payload.id;
-
-        // Set full name from JWT
-        const firstName = payload.firstName || "";
-        const lastName = payload.lastName || "";
-        setUserName(`${firstName} ${lastName}`.trim() || "User");
-
+        // Fetch appointments
         const res = await fetch(`http://localhost:3000/api/appointments/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        setAppointments(res.ok ? await res.json() : []);
 
-        if (res.ok) {
-          const data = await res.json();
-          setAppointments(Array.isArray(data) ? data : []);
-        }
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
+        // Fetch users
+        const userRes = await fetch(`http://localhost:3000/api/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const userData = userRes.ok ? await userRes.json() : [];
+        setUsers(userData);
+
+        // Filter doctors
+        const doctorUsers = userData.filter((u) => u.role === "doctor");
+        setDoctors(doctorUsers);
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoadingAppts(false);
+        setLoadingUsers(false);
       }
     };
 
-    fetchAppointments();
+    fetchData();
   }, []);
 
   return (
     <div className="dashboard-container">
       <Sidebar role="admin" />
-
       <main className="main-content">
         <header className="main-header">
-          <h1>Admin Dashboard</h1>
+          <div>
+            <h1>Admin Dashboard</h1>
+            <p style={{ color: '#7f8c8d', marginTop: '0.5rem' }}>System Overview & Management</p>
+          </div>
           <div className="user-info">
             <span>{userName}</span>
           </div>
         </header>
+
+        {/* Quick Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+          <div className="stat-card">
+            <div className="stat-icon"><img src="/Images/chart-column.png"/></div>
+            <div className="stat-content">
+              <h3>{appointments.length}</h3>
+              <p>Total Appointments</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon"><img src="/Images/users.png"/></div>
+            <div className="stat-content">
+              <h3>{loadingUsers ? "...": users.length}</h3>
+              <p>Active Users</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon"><img src="/Images/stethoscope.png"/></div>
+            <div className="stat-content">
+              <h3>{loadingUsers ? "…" : doctors.length}</h3>
+              <p>Doctors</p>
+            </div>
+          </div>
+        </div>
+
         <section className="appointments-section">
-          <h2>Recent Appointments</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h2>Recent Appointments</h2>
+            <Link to="/admin/appointments" style={{ 
+              color: '#3498db', 
+              textDecoration: 'none', 
+              fontWeight: '600',
+              fontSize: '0.95rem'
+            }}>
+              View All →
+            </Link>
+          </div>
           <div className="appointment-cards">
             {loadingAppts ? (
               <p>Loading appointments...</p>
             ) : appointments.length === 0 ? (
-              <p>No appointments found.</p>
+              <div className="empty-state">
+                <div className="empty-state-icon"><img src="/Images/chart-column.png"/></div>
+                <h3>No Appointments</h3>
+                <p>There are no appointments in the system.</p>
+              </div>
             ) : (
               appointments.slice(0, 3).map((apt) => (
-                <div className="card" key={apt._id || apt.id}>
-                  <h1>Appointment #{apt.id}</h1>
-                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { timeZone: 'UTC' }) : '—'}</h2>
-                  <p>{apt.startTime} - {apt.endTime}</p>
+                <div className="card" key={apt.id || apt._id}>
+                  <h1><img src="/Images/user.png"/> {apt.patientName} with Dr. {apt.doctorName}</h1>
+                  <h2><img src="/Images/calendar-days.png"/> {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }) : '—'}</h2>
+                  <p className="time-badge"><img src="/Images/clock.png"/> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
                 </div>
               ))
             )}
           </div>
         </section>
+
         <section className="appointments-section">
-          <h2>New Messages</h2>
-          <div className="appointment-cards">
-            <div className="card">
-              <h1>From: John Doe</h1>
-              <h2>Subject: Question about medication</h2>
-              <p>Received: 10/14/2025</p>
-            </div>
-            <div className="card">
-              <h1>From: Sarah Connor</h1>
-              <h2>Subject: Appointment follow-up</h2>
-              <p>Received: 10/13/2025</p>
-            </div>
-            <div className="card">
-              <h1>From: Pharmacy Team</h1>
-              <h2>Subject: Prescription refill approval</h2>
-              <p>Received: 10/12/2025</p>
-            </div>
+          <h2>Quick Actions</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+            <Link to="/admin/users" className="stat-card">
+              <span className="stat-icon"><img src="/Images/users.png"/></span>
+              <div>
+                <h3>User Management</h3>
+                <p>Manage system users</p>
+              </div>
+            </Link>
+            <Link to="/admin/appointments" className="stat-card">
+              <span className="stat-icon"><img src="/Images/calendar-days.png"/></span>
+              <div>
+                <h3>Appointments</h3>
+                <p>View and manage appointments</p>
+              </div>
+            </Link>
           </div>
         </section>
       </main>
