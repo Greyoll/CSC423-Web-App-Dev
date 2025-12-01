@@ -112,6 +112,12 @@ function AppointmentViewAdmin() {
       return;
     }
 
+    // Basic validation: end time should be after start time
+    if (formData.startTime >= formData.endTime) {
+      alert("End time must be after start time");
+      return;
+    }
+
     try {
       setIsCreating(true);
       const token = localStorage.getItem("token");
@@ -225,6 +231,12 @@ function AppointmentViewAdmin() {
 
     if (!editFormData.date || !editFormData.startTime || !editFormData.endTime || !editFormData.patientId || !editFormData.doctorId) {
       addNotification("Please fill in all fields", 'warning');
+      return;
+    }
+
+    // Basic validation: end time should be after start time
+    if (editFormData.startTime >= editFormData.endTime) {
+      alert("End time must be after start time");
       return;
     }
 
@@ -441,14 +453,13 @@ function AppointmentViewAdmin() {
             <h2>All Appointments</h2>
             <div className="appointment-cards">
               {appointments.map((apt) => (
-                <div className="card" key={apt.id || apt._id}>
-                  <p><strong>Appointment ID:</strong> {apt.id}</p>
-                  <h1>Appointment with {apt.patientName}</h1>
-                  <h2>Dr. {apt.doctorName}</h2>
-                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString() : '—'}</h2>
+                <div className="card" key={apt._id || apt.id}>
+                  <h1>Appointment #{apt.id}</h1>
+                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { timeZone: 'UTC' }) : '—'}</h2>
                   <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
-                  <p><strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString() : '—'}</p>
-
+                  <p><strong>Patient ID:</strong> {apt.patientId}</p>
+                  <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
+                  <p><strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' }) : '—'}</p>
                   <div style={{ marginTop: 10 }}>
                     <button onClick={() => openEdit(apt)}
                       style={{ backgroundColor: '#aac0b9ff', color: 'white', padding: '5px 10px', cursor: 'pointer', marginRight: '10px' }}

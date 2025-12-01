@@ -1,5 +1,5 @@
 const express = require("express");
-const { createUser, getAllUsers, getUser, updateUser, deleteUser } = require("../controllers/userController");
+const { createUser, getAllUsers, getUser, updateUser, deleteUser, changePassword } = require("../controllers/userController");
 const tokenValidator = require("../middleware/tokenValidator");
 
 const router = express.Router();
@@ -12,6 +12,8 @@ router.get("/", tokenValidator, getAllUsers);
 router.get("/:id", tokenValidator, getUser);
 // Update user
 router.put("/:id", tokenValidator, updateUser);
+// Change password (self or admin)
+router.put("/:id/password", tokenValidator, changePassword);
 // Delete user
 router.delete("/:id", tokenValidator, deleteUser);
 

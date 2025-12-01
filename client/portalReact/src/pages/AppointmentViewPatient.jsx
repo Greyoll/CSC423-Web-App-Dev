@@ -59,7 +59,7 @@ function AppointmentViewPatient() {
       } finally {
         setLoading(false);
       }
-    };
+  };
 
   // Open confirmation modal
   const openCancelConfirmation = (appointment) => {
@@ -138,11 +138,13 @@ function AppointmentViewPatient() {
             <h2>Your Appointments</h2>
             <div className="appointment-cards">
               {appointments.map((apt) => (
-                <div className="card" key={apt.id || apt._id}>
-                  <h1>Appointment with Dr. {apt.doctorName}</h1>
-                  <h2>Date: {new Date(apt.date).toLocaleDateString()}</h2>
+                <div className="card" key={apt._id || apt.id}>
+                  <h1>Appointment #{apt.id}</h1>
+                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { timeZone: 'UTC' }) : '—'}</h2>
                   <p><strong>Time:</strong> {apt.startTime} - {apt.endTime}</p>
-                  <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString()}</p>
+                  <p><strong>Patient ID:</strong> {apt.patientId}</p>
+                  <p><strong>Doctor ID:</strong> {apt.doctorId}</p>
+                  <p><strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' }) : '—'}</p>
                   <div style={{ marginTop: 10 }}>
                     <button 
                       onClick={() => openCancelConfirmation(apt)}

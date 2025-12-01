@@ -1,16 +1,57 @@
 const Appointment = require("../models/appointmentModel");
 const User = require("../models/userModel");
 
-// Helper function to compare dates (ignoring time)
-function isSameDate(date1, date2) {
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
-    d1.setHours(0, 0, 0, 0);
-    d2.setHours(0, 0, 0, 0);
-    return d1.getTime() === d2.getTime();
-}
+// Helper function to check if two time ranges overlap
+const timesOverlap = (start1, end1, start2, end2) => {
+    // Convert times to comparable format (minutes from midnight)
+    const toMinutes = (timeStr) => {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return hours * 60 + minutes;
+    };
+    
+    const s1 = toMinutes(start1);
+    const e1 = toMinutes(end1);
+    const s2 = toMinutes(start2);
+    const e2 = toMinutes(end2);
+    
+    // Check if ranges overlap: start1 < end2 AND start2 < end1
+    return s1 < e2 && s2 < e1;
+};
 
-// Create appointment WITHOUT double booking 
+// Helper function to check for conflicting appointments
+const checkConflict = async (date, startTime, endTime, doctorId, excludeId = null) => {
+    // Normalize date to compare only date part (ignore time)
+    const appointmentDate = new Date(date);
+    const startOfDay = new Date(appointmentDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(appointmentDate.setHours(23, 59, 59, 999));
+    
+    // Find all appointments for the same doctor on the same day
+    const query = {
+        doctorId: doctorId,
+        date: { $gte: startOfDay, $lte: endOfDay }
+    };
+    
+    // Exclude current appointment when editing
+    if (excludeId !== null) {
+        query.id = { $ne: excludeId };
+    }
+    
+    const existingAppointments = await Appointment.find(query);
+    
+    // Check if any existing appointment overlaps with the new time slot
+    for (const apt of existingAppointments) {
+        if (timesOverlap(startTime, endTime, apt.startTime, apt.endTime)) {
+            return {
+                conflict: true,
+                message: `Time conflict: Doctor already has an appointment from ${apt.startTime} to ${apt.endTime} on this date`
+            };
+        }
+    }
+    
+    return { conflict: false };
+};
+
+// Create appointment 
 module.exports.createAppointment = async (req, res) => {
     try {
         const { date, startTime, endTime, patientId, doctorId } = req.body;
@@ -20,69 +61,10 @@ module.exports.createAppointment = async (req, res) => {
             return res.status(400).json({ error: "Please fill in all fields" });
         }
 
-        // Parse the appointment date
-        const appointmentDate = new Date(date);
-        // Normalize to midnight
-        appointmentDate.setHours(0, 0, 0, 0); 
-
-        // Convert times to comparable format with actual date
-        const appointmentStart = new Date(appointmentDate);
-        const [startHour, startMin] = startTime.split(':');
-        appointmentStart.setHours(parseInt(startHour), parseInt(startMin));
-
-        const appointmentEnd = new Date(appointmentDate);
-        const [endHour, endMin] = endTime.split(':');
-        appointmentEnd.setHours(parseInt(endHour), parseInt(endMin));
-
-        if (appointmentStart >= appointmentEnd) {
-            return res.status(400).json({ error: "Start time must be before end time" });
-        }
-        
-        // Check for double booking
-        const existingApts = await Appointment.find({});
-
-        for (const existing of existingApts) {
-            // Only check appointments on the same date
-            if (!isSameDate(existing.date, appointmentDate)) {
-                continue;
-            }
-
-            const existingDate = new Date(existing.date);
-            existingDate.setHours(0, 0, 0, 0);
-
-            const existingStart = new Date(existingDate);
-            const [existingStartHour, existingStartMin] = existing.startTime.split(':');
-            existingStart.setHours(parseInt(existingStartHour), parseInt(existingStartMin));
-
-            const existingEnd = new Date(existingDate);
-            const [existingEndHour, existingEndMin] = existing.endTime.split(':');
-            existingEnd.setHours(parseInt(existingEndHour), parseInt(existingEndMin));
-            
-            /**
-             * Translating this part to english cuz my brain hurts
-             * if the new appointment starts BEFORE an existing one ends
-             * AND
-             * if the new appointment ends AFTER an existing one starts
-             * THEN
-             * there is overlap
-             * 
-             * or if its easier to think about it backwards
-             * if the new appointment ends BEFORE an existing one starts
-             * AND 
-             * the new appointment starts AFTER an existing one ends
-             * THEN
-             * there is no overlap
-             */
-            const overlap = appointmentStart < existingEnd && appointmentEnd > existingStart;
-            
-            if (overlap) {
-                if (existing.doctorId === doctorId) {
-                    return res.status(409).json({ error: "Doctor is already booked during this time" });
-                }
-                if (existing.patientId === patientId) {
-                    return res.status(409).json({ error: "Patient is already booked during this time" });
-                }
-            }
+        // Check for time conflicts
+        const conflictCheck = await checkConflict(date, startTime, endTime, doctorId);
+        if (conflictCheck.conflict) {
+            return res.status(409).json({ error: conflictCheck.message });
         }
 
         // Generate new Id
@@ -150,89 +132,18 @@ module.exports.getAppointments = async (req, res) => {
 // Update appointment WITH double booking check
 module.exports.updateAppointment = async (req, res) => {
     try {
-        const { date, startTime, endTime, patientId, doctorId } = req.body;
         const appointmentId = parseInt(req.params.id);
+        const { date, startTime, endTime, doctorId } = req.body;
 
-        const currentApt = await Appointment.findOne({ id: appointmentId });
-        if (!currentApt) {
-            return res.status(404).json({ error: "Appointment not found" });
-        }
-
-        const updatedDate = date || currentApt.date;
-        const updatedStartTime = startTime || currentApt.startTime;
-        const updatedEndTime = endTime || currentApt.endTime;
-        const updatedPatientId = patientId !== undefined ? patientId : currentApt.patientId;
-        const updatedDoctorId = doctorId !== undefined ? doctorId : currentApt.doctorId;
-
-        // Check if anything actually changed
-        const dateChanged = !isSameDate(updatedDate, currentApt.date);
-        const timeChanged = updatedStartTime !== currentApt.startTime || updatedEndTime !== currentApt.endTime;
-        const usersChanged = updatedPatientId !== currentApt.patientId || updatedDoctorId !== currentApt.doctorId;
-
-        // Only check for double booking if something relevant changed
-        if (dateChanged || timeChanged || usersChanged) {
-            const appointmentDate = new Date(updatedDate);
-            appointmentDate.setHours(0, 0, 0, 0);
-
-            const appointmentStart = new Date(appointmentDate);
-            const [startHour, startMin] = updatedStartTime.split(':');
-            appointmentStart.setHours(parseInt(startHour), parseInt(startMin));
-
-            const appointmentEnd = new Date(appointmentDate);
-            const [endHour, endMin] = updatedEndTime.split(':');
-            appointmentEnd.setHours(parseInt(endHour), parseInt(endMin));
-
-            // validate start < end
-            if (appointmentStart >= appointmentEnd) {
-                return res.status(400).json({ error: "Start time must be before end time" });
-            }
-
-            const existingApts = await Appointment.find({});
-
-            for (const existing of existingApts) {
-                // Exclude the appointment being updated
-                if (existing.id === appointmentId) {
-                    continue;
-                }
-
-                // Only check appointments on the same date
-                if (!isSameDate(existing.date, appointmentDate)) {
-                    continue;
-                }
-
-                const existingDate = new Date(existing.date);
-                existingDate.setHours(0, 0, 0, 0);
-
-                const existingStart = new Date(existingDate);
-                const [existingStartHour, existingStartMin] = existing.startTime.split(':');
-                existingStart.setHours(parseInt(existingStartHour), parseInt(existingStartMin));
-
-                const existingEnd = new Date(existingDate);
-                const [existingEndHour, existingEndMin] = existing.endTime.split(':');
-                existingEnd.setHours(parseInt(existingEndHour), parseInt(existingEndMin));
-
-                const overlap = appointmentStart < existingEnd && appointmentEnd > existingStart;
-                
-                if (overlap) {
-                    if (existing.doctorId === updatedDoctorId) {
-                        return res.status(409).json({ error: "Doctor is already booked during this time" });
-                    }
-                    if (existing.patientId === updatedPatientId) {
-                        return res.status(409).json({ error: "Patient is already booked during this time" });
-                    }
-                }
+        // Check for time conflicts (excluding the current appointment being edited)
+        if (date && startTime && endTime && doctorId) {
+            const conflictCheck = await checkConflict(date, startTime, endTime, doctorId, appointmentId);
+            if (conflictCheck.conflict) {
+                return res.status(409).json({ error: conflictCheck.message });
             }
         }
 
-        const updates = {
-            date: updatedDate,
-            startTime: updatedStartTime,
-            endTime: updatedEndTime,
-            patientId: updatedPatientId,
-            doctorId: updatedDoctorId,
-            lastUpdated: new Date()
-        };
-
+        const updates = { ...req.body, lastUpdated: new Date() };
         const updatedAppointment = await Appointment.findOneAndUpdate(
             { id: appointmentId },
             updates,
