@@ -142,20 +142,74 @@ function AppointmentViewDoctor() {
         {!loading && !error && appointments.length > 0 && (
           <section className="appointments-section">
             <h2>Your Appointments</h2>
-            <div className="appointment-cards">
-              {appointments.map((apt) => (
-                <div className="card" key={apt.id || apt._id}>
-                  <h1>Appointment with {apt.patientName || 'Unknown Patient'}</h1>
-                  <h2>Date: {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { timeZone: 'UTC' }) : '—'}</h2>
-                  <p><strong>Time:</strong> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}</p>
-                  <p><strong>Last Updated:</strong> {new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' })}</p>
-                  <div style={{ marginTop: 10 }}>
+            <div className="accordion" id="appointmentsAccordion" style={{ marginTop: '1.5rem' }}>
+              {appointments.map((apt, index) => (
+                <div className="accordion-item" key={apt.id || apt._id} style={{ marginBottom: '0.5rem', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
+                  <h2 className="accordion-header">
                     <button 
-                      onClick={() => openCancelConfirmation(apt)}
-                      style={{ backgroundColor: '#d32f2f', color: 'white', padding: '5px 10px', cursor: 'pointer' }}
+                      className="accordion-button collapsed" 
+                      type="button" 
+                      data-bs-toggle="collapse" 
+                      data-bs-target={`#collapse${index}`}
+                      aria-expanded="false"
+                      aria-controls={`collapse${index}`}
+                      style={{
+                        backgroundColor: '#f8f9fa',
+                        color: '#000',
+                        padding: '1rem 1.25rem',
+                        fontSize: '1rem',
+                        fontWeight: '600'
+                      }}
                     >
-                      Cancel Appointment
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', paddingRight: '1rem' }}>
+                        <span>{apt.patientName || 'Unknown'}</span>
+                        <span style={{ fontWeight: 'normal', color: '#666' }}>
+                          {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }) : '—'}
+                        </span>
+                      </div>
                     </button>
+                  </h2>
+                  <div 
+                    id={`collapse${index}`} 
+                    className="accordion-collapse collapse" 
+                    data-bs-parent="#appointmentsAccordion"
+                  >
+                    <div className="accordion-body" style={{ padding: '1.25rem', backgroundColor: '#fff' }}>
+                      <div style={{ marginBottom: '1rem' }}>
+                        <p style={{ margin: '0.5rem 0' }}>
+                          <strong><img src="/Images/calendar-days.png"/> Date:</strong> {apt.date ? new Date(apt.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }) : '—'}
+                        </p>
+                        <p style={{ margin: '0.5rem 0' }}>
+                          <strong><img src="/Images/clock.png"/> Time:</strong> {formatTime(apt.startTime)} - {formatTime(apt.endTime)}
+                        </p>
+                        <p style={{ margin: '0.5rem 0' }}>
+                          <strong><img src="/Images/user.png"/> Patient:</strong> {apt.patientName || 'Unknown'}
+                        </p>
+                        <p style={{ margin: '0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
+                          <strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' }) : '—'}
+                        </p>
+                      </div>
+                      <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #eee' }}>
+                        <button 
+                          onClick={() => openCancelConfirmation(apt)}
+                          style={{ 
+                            backgroundColor: '#dc3545', 
+                            color: 'white', 
+                            padding: '0.5rem 1.5rem', 
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            fontSize: '0.95rem',
+                            fontWeight: '500',
+                            transition: 'background-color 0.2s'
+                          }}
+                          onMouseOver={(e) => e.target.style.backgroundColor = '#c82333'}
+                          onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
+                        >
+                          Cancel Appointment
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
