@@ -4,6 +4,10 @@
 * { font-family: Arial, sans-serif; }
 :root { color-scheme: light; }
 body { margin: 0; padding: 0; background-color: #fff; }
+html, body, #root {
+  height: -50vh;
+  width: 100vw;
+}
 
 /* =================================
    HEADER & NAVIGATION
