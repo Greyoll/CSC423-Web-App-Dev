@@ -5,8 +5,8 @@
 :root { color-scheme: light; }
 body { margin: 0; padding: 0; background-color: #fff; }
 html, body, #root {
-  height: -50vh;
-  width: 100vw;
+  height: -50%;
+  width: 100%;
 }
 
 /* =================================
