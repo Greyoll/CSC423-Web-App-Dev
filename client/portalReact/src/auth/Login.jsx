@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useNotification } from '../context/NotificationContext';
@@ -83,10 +83,10 @@ function Login() {
         </div>
         <nav>
           <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#" className="login-btn">Log In</a></li>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/contact">Contact Us</Link></li>
+            <li><Link to="/about">About Us</Link></li>
+            <li><Link to="/login" className="login-btn">Log In</Link></li>
           </ul>
         </nav>
       </header>
