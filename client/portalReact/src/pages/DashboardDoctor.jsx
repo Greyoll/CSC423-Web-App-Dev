@@ -92,9 +92,6 @@ function DashboardDoctor() {
             <h1>Welcome back, Dr. {userName}!</h1>
             <p style={{ color: '#7f8c8d', marginTop: '0.5rem' }}>Here's your schedule for today</p>
           </div>
-          <div className="user-info">
-            <span>Dr. {userName}</span>
-          </div>
         </header>
 
         {/* Quick Stats */}

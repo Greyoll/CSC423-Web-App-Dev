@@ -125,9 +125,6 @@ function AppointmentViewPatient() {
       <main className="main-content">
         <header className="main-header">
           <h1>All Appointments</h1>
-          <div className="user-info">
-            <span>{userName}</span>
-          </div>
         </header>
 
         {loading && <p style={{ padding: '20px' }}>Loading appointments...</p>}

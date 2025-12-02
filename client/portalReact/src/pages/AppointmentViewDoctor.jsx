@@ -130,9 +130,6 @@ function AppointmentViewDoctor() {
       <main className="main-content">
         <header className="main-header">
           <h1>Doctor Appointments</h1>
-          <div className="user-info">
-            <span>Dr. {userName}</span>
-          </div>
         </header>
         {loading && <p style={{ padding: '20px' }}>Loading appointments...</p>}
         {error && <p style={{ padding: '20px', color: 'red' }}>Error: {error}</p>}

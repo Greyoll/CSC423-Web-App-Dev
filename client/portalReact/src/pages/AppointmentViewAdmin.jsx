@@ -308,9 +308,6 @@ function AppointmentViewAdmin() {
       <main className="main-content">
         <header className="main-header">
           <h1>Admin Appointments</h1>
-          <div className="user-info">
-            <span>{userName}</span>
-          </div>
         </header>
 
         <button 
