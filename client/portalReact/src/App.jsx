@@ -15,6 +15,8 @@ import { ThemeProvider } from './context/ThemeContext';
 import { NotificationProvider } from './context/NotificationContext';
 import NotificationDisplay from './components/NotificationDisplay';
 import Sidebar from './components/Sidebar.jsx';
+import ContactUs from './pages/ContactUs';
+import AboutUs from './pages/AboutUs';
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function AppRoutes() {
     <Routes>
       {/* Public Route */}
       <Route path="/login" element={<Login />} />
+      <Route path="/contact" element={<ContactUs />} />
+      <Route path="/about" element={<AboutUs />} />
 
       {/* Patient Routes */}
       <Route 
