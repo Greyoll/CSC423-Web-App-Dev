@@ -174,9 +174,6 @@ function Settings() {
       <main className="main-content">
         <header className="main-header">
           <h1>Settings</h1>
-          <div className="user-info">
-            <span>{userInfo ? `${userInfo.firstName} ${userInfo.lastName}` : 'User'}</span>
-          </div>
         </header>
 
         {loading && <p style={{ padding: '20px' }}>Loading user information...</p>}

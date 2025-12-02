@@ -73,9 +73,6 @@ function DashboardPatient() {
             <h1>Welcome back, {userName}!</h1>
             <p style={{ color: '#7f8c8d', marginTop: '0.5rem' }}>Here's your health overview</p>
           </div>
-          <div className="user-info">
-            <span>{userName}</span>
-          </div>
         </header>
 
         {/* Quick Stats */}

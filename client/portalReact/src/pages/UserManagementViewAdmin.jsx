@@ -164,9 +164,6 @@ function UserManagementViewAdmin() {
             <main className="main-content">
                 <header className="main-header">
                     <h1>Admin Dashboard</h1>
-                    <div className="user-info">
-                        <span>{userName}</span>
-                    </div>
                 </header>
                 <h2>User Management</h2>
                 <div className="form-section">

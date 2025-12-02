@@ -23,6 +23,29 @@ function AppointmentViewDoctor() {
     return `${hour12}:${minutes} ${ampm}`;
   };
 
+  // Format lastUpdated to show local time with timezone
+  const formatLastUpdated = (dateString) => {
+    if (!dateString) return '—';
+    
+    const date = new Date(dateString);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) return '—';
+    
+    // Format with full details including timezone
+    const options = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZoneName: 'short'
+    };
+    
+    return date.toLocaleString('en-US', options);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const payload = parseJwt(token);
@@ -130,9 +153,6 @@ function AppointmentViewDoctor() {
       <main className="main-content">
         <header className="main-header">
           <h1>Doctor Appointments</h1>
-          <div className="user-info">
-            <span>Dr. {userName}</span>
-          </div>
         </header>
         {loading && <p style={{ padding: '20px' }}>Loading appointments...</p>}
         {error && <p style={{ padding: '20px', color: 'red' }}>Error: {error}</p>}
@@ -186,7 +206,7 @@ function AppointmentViewDoctor() {
                           <strong><img src="/Images/user.png"/> Patient:</strong> {apt.patientName || 'Unknown'}
                         </p>
                         <p style={{ margin: '0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
-                          <strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' }) : '—'}
+                          <strong>Last Updated:</strong> {formatLastUpdated(apt.lastUpdated)}
                         </p>
                       </div>
                       <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #eee' }}>

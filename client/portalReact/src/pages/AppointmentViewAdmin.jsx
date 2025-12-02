@@ -43,6 +43,29 @@ function AppointmentViewAdmin() {
     return `${hour12}:${minutes} ${ampm}`;
   };
 
+  // Format lastUpdated to show local time with timezone
+  const formatLastUpdated = (dateString) => {
+    if (!dateString) return '—';
+    
+    const date = new Date(dateString);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) return '—';
+    
+    // Format with full details including timezone
+    const options = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZoneName: 'short'
+    };
+    
+    return date.toLocaleString('en-US', options);
+  };
+
   useEffect(() => {
     fetchUsers();
     fetchAppointments();
@@ -308,9 +331,6 @@ function AppointmentViewAdmin() {
       <main className="main-content">
         <header className="main-header">
           <h1>Admin Appointments</h1>
-          <div className="user-info">
-            <span>{userName}</span>
-          </div>
         </header>
 
         <button 
@@ -508,7 +528,7 @@ function AppointmentViewAdmin() {
                           <strong><img src="/Images/user.png"/> Patient:</strong> {apt.patientName || 'Unknown'}
                         </p>
                         <p style={{ margin: '0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
-                          <strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' }) : '—'}
+                          <strong>Last Updated:</strong> {formatLastUpdated(apt.lastUpdated)}
                         </p>
                         <p style={{ margin: '0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
                           <strong>Appointment ID:</strong> {apt.id || apt._id}
