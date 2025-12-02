@@ -6,21 +6,18 @@ A comprehensive medical portal web application built with React and Node.js that
 
 ### For Patients
 - View upcoming appointments
-- Access appointment history
-- Schedule new appointments
-- Update personal settings
+- Cancel appointments
 - Toggle dark mode theme
+- Change password
 
 ### For Doctors
-- View patient appointments
-- Access patient records
-- Monitor upcoming schedules
+- View upcoming appointments
+- Cancel appointments
 - Manage profile settings
 
 ### For Administrators
 - Full user management (create, read, update, delete)
 - Appointment management and oversight
-- System-wide analytics and monitoring
 - Complete access control
 
 ### General Features
@@ -130,11 +127,55 @@ npm run dev
 
 ```
 valdez-medical-portal/
+├── client/
+│   └── portalReact/
+│       ├── public/
+│       │   ├── Images/
+│       │   └── happy-stan.jpg
+│       ├── src/
+│       │   ├── auth/
+│       │   │   └── Login.jsx
+│       │   ├── components/
+│       │   │   ├── ConfirmationModal.css
+│       │   │   ├── ConfirmationModal.jsx
+│       │   │   ├── NotificationDisplay.css
+│       │   │   ├── NotificationDisplay.jsx
+│       │   │   ├── ProtectedRoute.jsx
+│       │   │   └── Sidebar.jsx
+│       │   ├── context/
+│       │   │   ├── AuthContext.jsx
+│       │   │   ├── NotificationContext.jsx
+│       │   │   └── ThemeContext.jsx
+│       │   ├── hooks/
+│       │   │   └── useLogin.js
+│       │   ├── pages/
+│       │   │   ├── AboutUs.jsx
+│       │   │   ├── AppointmentViewPatient.jsx
+│       │   │   ├── AppointmentViewDoctor.jsx
+│       │   │   ├── AppointmentViewAdmin.jsx
+│       │   │   ├── ContactUs.jsx
+│       │   │   ├── DashboardAdmin.jsx
+│       │   │   ├── DashboardDoctor.jsx
+│       │   │   ├── DashboardPatient.jsx
+│       │   │   ├── Settings.jsx
+│       │   │   └── UserManagementViewAdmin.jsx
+│       │   ├── App.css
+│       │   ├── App.jsx
+│       │   ├── index.css
+│       │   └── index.jsx
+│       ├── .gitignore
+│       ├── eslint.config.js
+│       ├── index.html
+│       ├── package-lock.json
+│       ├── package.json
+│       └── vite.config.js
 ├── server/
 │   ├── controllers/
 │   │   ├── appointmentController.js
 │   │   ├── authController.js
 │   │   └── userController.js
+│   ├── middleware/
+│   │   └── tokenValidator.js
 │   ├── models/
 │   │   ├── appointmentModel.js
 │   │   └── userModel.js
@@ -142,44 +183,13 @@ valdez-medical-portal/
 │   │   ├── appointmentRoutes.js
 │   │   ├── authRoutes.js
 │   │   └── userRoutes.js
-│   ├── middleware/
-│   │   └── tokenValidator.js
 │   ├── index.js
+│   ├── package-lock.json
 │   ├── package.json
 │   └── .env
 │
-├── client/
-│   └── portalReact/
-│       ├── public/
-│       │   ├── Images/
-│       │   └── vite.svg
-│       ├── src/
-│       │   ├── auth/
-│       │   │   └── Login.jsx
-│       │   ├── components/
-│       │   │   ├── ProtectedRoute.jsx
-│       │   │   └── Sidebar.jsx
-│       │   ├── context/
-│       │   │   ├── AuthContext.jsx
-│       │   │   └── ThemeContext.jsx
-│       │   ├── hooks/
-│       │   │   └── useLogin.js
-│       │   ├── pages/
-│       │   │   ├── DashboardPatient.jsx
-│       │   │   ├── DashboardDoctor.jsx
-│       │   │   ├── DashboardAdmin.jsx
-│       │   │   ├── AppointmentViewPatient.jsx
-│       │   │   ├── AppointmentViewDoctor.jsx
-│       │   │   ├── AppointmentViewAdmin.jsx
-│       │   │   ├── UserManagementViewAdmin.jsx
-│       │   │   └── Settings.jsx
-│       │   ├── App.jsx
-│       │   ├── App.css
-│       │   └── index.jsx
-│       ├── package.json
-│       └── vite.config.js
-│
 ├── .gitignore
+├── package-lock.json
 ├── package.json
 └── README.md
 ```
@@ -194,13 +204,14 @@ valdez-medical-portal/
 - `GET /api/users/:id` - Get specific user
 - `POST /api/users` - Create new user (admin only)
 - `PUT /api/users/:id` - Update user (admin only)
+- `PUT /api/users/:id/password` - Change password
 - `DELETE /api/users/:id` - Delete user (admin only)
 
 ### Appointments
 - `GET /api/appointments/:user` - Get appointments for a user
 - `POST /api/appointments` - Create new appointment (admin only)
 - `PUT /api/appointments/:id` - Update appointment (admin only)
-- `DELETE /api/appointments/:id` - Delete appointment (admin only)
+- `DELETE /api/appointments/:id` - Delete appointment
 
 ## Authentication
 
@@ -217,14 +228,12 @@ Tokens expire after 1 hour and contain encoded user information (id, username, r
 
 ### Patient
 - View personal appointments
-- Access appointment history
 - Update profile settings
 - Cannot manage other users
 
 ### Doctor
 - View assigned appointments
-- Access patient information
-- View patient updates
+- Update settings
 - Cannot create or delete appointments
 
 ### Admin
@@ -258,7 +267,7 @@ Password: ACMChair
 
 ### Features to Test
 - **Patient**: View appointments, access dashboard, toggle dark mode
-- **Doctor**: View assigned appointments, access patient information
+- **Doctor**: View assigned appointments, access dashboard
 - **Admin**: Create/edit/delete users, manage appointments, full system access
 
 ## Important Notes
@@ -298,5 +307,5 @@ For issues or questions, please refer to the project repository or contact Colli
 
 ---
 
-**Last Updated:** November 2025  
+**Last Updated:** December 2025  
 **Version:** 1.0.0
