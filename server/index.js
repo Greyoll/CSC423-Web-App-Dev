@@ -8,6 +8,7 @@ const appointmentRoutes = require("./routes/appointmentRoutes");
 
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
+// Make sure your .env is in your server folder for this to work
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
