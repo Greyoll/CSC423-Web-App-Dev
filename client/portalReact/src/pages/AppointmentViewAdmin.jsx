@@ -510,6 +510,9 @@ function AppointmentViewAdmin() {
                         <p style={{ margin: '0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
                           <strong>Last Updated:</strong> {apt.lastUpdated ? new Date(apt.lastUpdated).toLocaleString('en-US', { timeZone: 'UTC' }) : '—'}
                         </p>
+                        <p style={{ margin: '0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
+                          <strong>Appointment ID:</strong> {apt.id || apt._id}
+                        </p>
                       </div>
                       <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #eee', display: 'flex', gap: '10px' }}>
                         <button 
