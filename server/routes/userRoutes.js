@@ -12,7 +12,7 @@ router.get("/", tokenValidator, getAllUsers);
 router.get("/:id", tokenValidator, getUser);
 // Update user
 router.put("/:id", tokenValidator, updateUser);
-// Change password (self or admin)
+// Change password 
 router.put("/:id/password", tokenValidator, changePassword);
 // Delete user
 router.delete("/:id", tokenValidator, deleteUser);

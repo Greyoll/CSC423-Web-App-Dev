@@ -108,6 +108,7 @@ module.exports.updateUser = async (req, res) => {
     }
 };
 
+// Change password for non admins
 module.exports.changePassword = async (req, res) => {
     try {
         const requester = req.user; 
