@@ -20,16 +20,29 @@ function DashboardDoctor() {
   };
 
   // Check if appointment is today
-  const isToday = (dateStr) => {
-    const [year, month, day] = dateStr.split("T")[0].split("-");
+  const isTodayAndNotEnded = (dateStr, endTime) => {
+    const [year, month, day] = dateStr.split("T")[0].split("-"); 
     const aptDate = new Date(year, month - 1, day); // local timezone
 
     const today = new Date();
-    return (
+    const isToday = (
       aptDate.getFullYear() === today.getFullYear() &&
       aptDate.getMonth() === today.getMonth() &&
       aptDate.getDate() === today.getDate()
     );
+
+    // If not today, return false
+    if (!isToday) return false;
+
+    // Check if appointment end time has passed
+    if (!endTime) return true; // If no end time, show it
+
+    const [endHours, endMinutes] = endTime.split(':').map(Number);
+    const appointmentEnd = new Date(today);
+    appointmentEnd.setHours(endHours, endMinutes, 0, 0);
+
+    // Return true only if current time is before appointment end time
+    return today < appointmentEnd;
   };
 
   useEffect(() => {
@@ -67,7 +80,7 @@ function DashboardDoctor() {
   }, []);
 
   const uniquePatientCount = new Set(appointments.map(a => a.patientId)).size;
-  const todayAppointments = appointments.filter(apt => isToday(apt.date));
+  const todayAppointments = appointments.filter(apt => isTodayAndNotEnded(apt.date, apt.endTime));
 
   return (
     <div className="dashboard-container">
