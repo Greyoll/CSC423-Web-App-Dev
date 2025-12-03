@@ -235,6 +235,7 @@ function UserManagementViewAdmin() {
                                                 role: u.role,
                                                 password: "",
                                             });
+                                            window.scrollTo({ top: 0, behavior: "smooth" });
                                         }}>Edit</button>
                                         <button 
                                             onClick={() => openDeleteConfirmation(u.id, `${u.firstName} ${u.lastName}`)}
