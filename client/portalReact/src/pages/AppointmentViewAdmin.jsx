@@ -147,7 +147,7 @@ function AppointmentViewAdmin() {
 
     // Basic validation: end time should be after start time
     if (formData.startTime >= formData.endTime) {
-      alert("End time must be after start time");
+      addNotification("End time must be after start time", 'warning');
       return;
     }
 
