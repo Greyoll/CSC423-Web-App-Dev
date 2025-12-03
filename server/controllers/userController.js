@@ -81,27 +81,33 @@ module.exports.getUser = async (req, res) => {
 module.exports.updateUser = async (req, res) => {
     try {
         const updates = req.body;
-        
-        // Try to update by MongoDB _id first
-        let updatedUser = await User.findByIdAndUpdate(
-            req.params.id,
-            updates,
-            {new: true}
-        ).catch(() => null);
-        
-        // If not found, try to update by custom id field
-        if (!updatedUser) {
-            updatedUser = await User.findOneAndUpdate(
-                { id: parseInt(req.params.id) },
-                updates,
-                { new: true }
-            );
+
+        // Try to find the user
+        let user = await User.findById(req.params.id).catch(() => null);
+
+        if (!user) {
+            user = await User.findOne({ id: parseInt(req.params.id) });
         }
 
-        if (!updatedUser) {
+        if (!user) {
             return res.status(404).json({ error: "Error! User not found" });
         }
-        res.status(200).json({ message: "User updated", user: updatedUser});
+
+        // Apply non-password changes
+        user.firstName = updates.firstName ?? user.firstName;
+        user.lastName = updates.lastName ?? user.lastName;
+        user.username = updates.username ?? user.username;
+        user.role = updates.role ?? user.role;
+
+        // Handle password update with hashing
+        if (updates.password && updates.password.trim() !== "") {
+            user.password = await bcrypt.hash(updates.password, 10);
+            user.lastPasswordChange = new Date();
+        }
+
+        // ensures hashing + hooks run
+        await user.save(); 
+        res.status(200).json({ message: "User updated", user: user});
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "An error has occurred, could not update user"});
